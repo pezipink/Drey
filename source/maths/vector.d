@@ -12,7 +12,7 @@ struct Vector(int n, T = float) {
 	alias Vector!(n,T) thisType;
 	enum arity = n;
 	private T[n] _data;
-	
+
 	// constructors 
 	this(T data){
 		_data[] = data;
@@ -24,7 +24,9 @@ struct Vector(int n, T = float) {
 		_data[] = data[];
 	}
 
-	this(Range)(Range r)if (isIterable!Range) {
+	this(Range)(Range r)
+		if (isIterable!Range) 
+	{
 		assert(r.length == n);
 		//this one lets us use results of functional algos from std.algorithm
 		//withouht an additional copy ( I think! )
@@ -74,6 +76,18 @@ struct Vector(int n, T = float) {
 			return div(this,rhs);
 		}
 	}
+
+  void opOpAssign(string op)(thisType rhs) if (op == "+" || op == "-") {
+  	import std.conv : to;
+  	foreach(i,ref v;_data)
+  		mixin("v"~op~"=rhs[i];");
+  }	
+	
+  void opOpAssign(string op)(T rhs) if (op == "*" || op == "/") {
+  	foreach(ref v;_data)
+  		mixin("v"~op~"=rhs;");
+  }	
+
 }
 
 // meta stuff
@@ -91,7 +105,7 @@ template isVector(T) {
 	enum isVector = (is(T : Vector!(N,TL), int N, TL));		
 }
 
-/// extracts the type of the underlying data eg float
+// extracts the type of the underlying data eg float
 template vectorType(T) {
 	static if (is(T == Vector!(N,U), int N, U )) {
 		alias vectorType = U;
@@ -119,7 +133,7 @@ T add(T)(T left, T right) pure
 	import std.range : zip;
 	return T(
 		zip(left[],right[])
-	     .map!(x=>x[0]+x[1]));
+	    .map!(x=>x[0]+x[1]));
 }
 
 T sub(T)(T left, T right) pure 
@@ -128,7 +142,7 @@ T sub(T)(T left, T right) pure
 	import std.range : zip;
 	return T(
 		zip(left[],right[])
-	     .map!(x=>x[0]+(-x[1])));
+	    .map!(x=>x[0]+(-x[1])));
 }
 
 private mixin template seed() {
@@ -174,7 +188,7 @@ auto dot(T)(T left, T right)
 		reduce!((acc, x)=> acc + x[0] * x[1])(seed,zip(left[],right[]));		
 }
 
-
+// cross product is 3D only
 auto cross(T)(T left, T right) 
 	if(isVector!T && T.arity == 3) 
 {
@@ -219,6 +233,18 @@ unittest {
 	// +  - 
 	assert(equal([10,10,10],(b + vec3(12))[]));
 	assert(equal([-14,-14,-14],(b - vec3(12))[]));
+
+	a *= 5.0;
+
+	assert(equal(a[],vec3(10,10,10)[]));
+	a /= 2.0;
+	assert(equal(a[],vec3(5,5,5)[]));
+	
+	a += b;
+	assert(equal(a[],vec3(3,3,3)[]));
+	
+	a -= b;
+	assert(equal(a[],vec3(5,5,5)[]));
 }
 
 unittest {
@@ -230,7 +256,7 @@ unittest {
 	// multiply (commutatative)
 	auto b = a.mul(5.0);
 	assert(equal([-10.0,-10.0],b[]));
-	auto c = mul(a,5);;
+	auto c = mul(a,5);
 	assert(equal([-10.0,-10.0],c[]));
 	assert(equal([-10.0,-10.0],(a * 5)[]));		
 
@@ -265,7 +291,12 @@ unittest {
 	assert(dot(vec2(4,6),vec2(-3,7)) == 30);
 }
 
-
+unittest{
+import std.stdio;
+	auto a  = (1,"john",4);
+	writeln(typeid(a), " -> ", a);
+	assert(true);
+}
 
 //template isFloatVector(T) {
 //	static if (is(T == Vector!(N,U), int N, U : float)) {
