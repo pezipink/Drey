@@ -37,7 +37,6 @@ struct Vector(int n, T = float) {
 	// setup handy aliases for common vector usages; 
 	// x y z w
 	// r g b a
-
 	alias get!0 x;
 	alias get!0 r;
 

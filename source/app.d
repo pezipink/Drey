@@ -12,6 +12,8 @@ void main()
 	SDL_Init(SDL_INIT_EVERYTHING);  
     //auto _window = SDL_CreateWindow("Squirrelatron", SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED,640,480,SDL_WINDOW_SHOWN);
 
+
+
 	//readln();
 }
 
