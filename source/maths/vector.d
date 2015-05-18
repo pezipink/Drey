@@ -210,7 +210,7 @@ unittest {
 	assert(c.x == 2 && c.y == 3 && c.z==4);
 }
 
-unittest {
+unittest { 
 	import std.algorithm : equal;
 	// negate
 	auto a = vec3(2);
@@ -231,7 +231,7 @@ unittest {
 	// multiply (commutatative)
 	auto b = a.mul(5.0);
 	assert(equal([-10.0,-10.0],b[]));
-	auto c = mul(a,5);
+	auto c = mul(a,5);;
 	assert(equal([-10.0,-10.0],c[]));
 	assert(equal([-10.0,-10.0],(a * 5)[]));		
 
