@@ -1,0 +1,612 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+			[
+				"tex",
+				"texHeight	variable"
+			],
+			[
+				"sc",
+				"screenHeight	variable"
+			],
+			[
+				"scr",
+				"screenWidth	variable"
+			],
+			[
+				"shiftl",
+				"shiftLookY	variable"
+			],
+			[
+				"sh",
+				"shiftLookX	variable"
+			],
+			[
+				"scre",
+				"screenHeight	variable"
+			],
+			[
+				"screen",
+				"screenHeight	variable"
+			],
+			[
+				"scree",
+				"screenWidth	variable"
+			],
+			[
+				"text",
+				"texHeight	variable"
+			],
+			[
+				"_src",
+				"_scrTex	variable"
+			],
+			[
+				"_scr",
+				"_scrTex	variable"
+			],
+			[
+				"key",
+				"keyMapping	variable"
+			],
+			[
+				"l",
+				"LeftStick"
+			],
+			[
+				"j",
+				"jaxis"
+			],
+			[
+				"_cu",
+				"_currentFrame	variable"
+			],
+			[
+				"_curr",
+				"_currentRow	variable"
+			],
+			[
+				"x",
+				"X	function"
+			],
+			[
+				"cl",
+				"clean	function"
+			],
+			[
+				"r",
+				"running	function"
+			],
+			[
+				"im",
+				"image_surface	variable"
+			],
+			[
+				"s",
+				"scanf	function"
+			]
+		]
+	},
+	"buffers":
+	[
+		{
+			"file": "source/app.d",
+			"settings":
+			{
+				"buffer_size": 378,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "source/maths/vector.d",
+			"settings":
+			{
+				"buffer_size": 1801,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "dub.selections.json",
+			"settings":
+			{
+				"buffer_size": 123,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"contents": "Generating test runner configuration '__test__library__' for 'library' (library).\nTarget derelict-util 1.9.1 is up to date. Use --force to rebuild.\nTarget derelict-sdl2 1.9.5 is up to date. Use --force to rebuild.\nTarget derelict-gl3 1.0.12 is up to date. Use --force to rebuild.\nBuilding drey ~master configuration \"__test__library__\", build type unittest.\nCompiling using dmd...\nvector.d(33): Error: function maths.vector.Vector!(2, float).Vector.opUnary!\"-\".opUnary.MapResult!(__lambda1, float[]).MapResult.opSlice (uint low, uint high) is not callable using argument types ()\nvector.d(96): Error: template instance maths.vector.Vector!(2, float).Vector.opUnary!\"-\" error instantiating\nFAIL ..\\..\\.dub\\build\\__test__library__-unittest-windows-x86-dmd_2067-64278FEB98FA53798AB088435E9616F1\\ __test__library__ executable\nError executing command test: dmd failed with exit code 1.\n\n[Finished in 1.1s]",
+			"settings":
+			{
+				"buffer_size": 900,
+				"line_ending": "Windows",
+				"name": "Build output",
+				"scratch": true
+			}
+		}
+	],
+	"build_system": "",
+	"build_system_choices":
+	[
+	],
+	"build_varint": "",
+	"command_palette":
+	{
+		"height": 265.0,
+		"last_filter": "buil",
+		"selected_items":
+		[
+			[
+				"buil",
+				"Build output always at top"
+			],
+			[
+				"D",
+				"Set Syntax: D"
+			],
+			[
+				"si",
+				"View: Toggle Side Bar"
+			],
+			[
+				"togg",
+				"View: Toggle Side Bar"
+			],
+			[
+				"side",
+				"View: Toggle Side Bar"
+			],
+			[
+				"w",
+				"Word Wrap: Toggle"
+			],
+			[
+				"snippet fo",
+				"Snippet: foreach(e; …) { … }"
+			],
+			[
+				"wrap",
+				"Word Wrap: Toggle"
+			],
+			[
+				"wr",
+				"Word Wrap: Toggle"
+			],
+			[
+				"build",
+				"Build output always at top"
+			],
+			[
+				"d",
+				"Set Syntax: D"
+			],
+			[
+				"wra",
+				"Word Wrap: Toggle"
+			],
+			[
+				"upper",
+				"Convert Case: Upper Case"
+			],
+			[
+				"install",
+				"Package Control: Install Package"
+			],
+			[
+				"in",
+				"Indentation: Reindent Lines"
+			],
+			[
+				"dc",
+				"DKit: List Installed DUB Packages"
+			],
+			[
+				"ins",
+				"Package Control: Install Package"
+			]
+		],
+		"width": 377.0
+	},
+	"console":
+	{
+		"height": 151.0,
+		"history":
+		[
+			"import urllib.request,os,hashlib; h = 'eb2297e1a458f27d836c04bb0cbaf282' + 'd0e7a3098092775ccb37ca9d6b2e4b7d'; pf = 'Package Control.sublime-package'; ipp = sublime.installed_packages_path(); urllib.request.install_opener( urllib.request.build_opener( urllib.request.ProxyHandler()) ); by = urllib.request.urlopen( 'http://packagecontrol.io/' + pf.replace(' ', '%20')).read(); dh = hashlib.sha256(by).hexdigest(); print('Error validating download (got %s instead of %s), please try manual install' % (dh, h)) if dh != h else open(os.path.join( ipp, pf), 'wb' ).write(by)"
+		]
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"expanded_folders":
+	[
+		"/F/GIT/Drey",
+		"/F/GIT/Drey/source",
+		"/F/GIT/Drey/source/maths"
+	],
+	"file_history":
+	[
+		"/F/GIT/Drey/source/maths/vector.d",
+		"/F/GIT/Squirrelatron/source/Vector2D.d",
+		"/F/GIT/Squirrelatron/source/Vector.d",
+		"/F/GIT/Squirrelatron/source/app.d",
+		"/F/GIT/Squirrelatron/source/Invaders.d",
+		"/F/GIT/Squirrelatron/source/InputHandler.d",
+		"/F/GIT/Squirrelatron/source/Workshop.d",
+		"/F/GIT/Squirrelatron/source/TextureManager.d",
+		"/F/GIT/Squirrelatron/source/BackgroundEffects.d",
+		"/F/GIT/Squirrelatron/source/Maths/Vectors.d",
+		"/C/Users/Juan/Documents/Visual Studio 2013/Projects/ConsoleApp1/ConsoleApp1/source/tcod/c/types.d",
+		"/C/Users/Juan/Documents/Visual Studio 2013/Projects/ConsoleApp1/ConsoleApp1/main.d",
+		"/C/Users/Juan/Documents/Visual Studio 2013/Projects/ConsoleApp1/ConsoleApp1/source/app.d",
+		"/C/Users/Juan/Documents/Visual Studio 2013/Projects/ConsoleApp1/ConsoleApp1/source/tcod/c/functions.d",
+		"/C/Users/Juan/Documents/Visual Studio 2013/Projects/ConsoleApp1/ConsoleApp1/tcod/c/functions.d",
+		"/F/GIT/libtcod-d/source/tcod/c/functions.d",
+		"/C/Users/Juan/Documents/Visual Studio 2013/Projects/ConsoleApp1/ConsoleApp1/source/tcod/c/all.d",
+		"/C/Users/Juan/Documents/Visual Studio 2013/Projects/ConsoleApp1/ConsoleApp1/source/dumpground.d",
+		"/C/Users/Juan/Documents/Visual Studio 2013/Projects/ConsoleApp1/ConsoleApp1/dataStructures.d",
+		"/C/Users/Juan/AppData/Roaming/Sublime Text 3/Packages/User/DUB-Build.sublime-build",
+		"/C/Users/Juan/AppData/Roaming/Sublime Text 3/Packages/User/DUB.sublime-build",
+		"/C/Users/Juan/AppData/Roaming/Sublime Text 3/Packages/DKit/DKit.sublime-settings",
+		"/F/utils/Sublime Text 3/Packages/D.sublime-package",
+		"/C/Users/ross/AppData/Roaming/Sublime Text 3/Packages/User/DUB.sublime-build",
+		"/C/Users/ross/Documents/DCD/makefile",
+		"/C/Program Files/Sublime Text 3/Packages/D.sublime-package"
+	],
+	"find":
+	{
+		"height": 27.0
+	},
+	"find_in_files":
+	{
+		"height": 93.0,
+		"where_history":
+		[
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": false,
+		"find_history":
+		[
+			"TL",
+			"isFloatVector",
+			"this.data",
+			"data",
+			"tunn",
+			"h",
+			"w",
+			"h",
+			"w",
+			"W",
+			"w",
+			"y",
+			"x",
+			"f1_v",
+			"48",
+			"y",
+			"x",
+			"h",
+			"w",
+			"ubyte",
+			"scr->",
+			"Uint32",
+			"scre",
+			"angle",
+			"Base",
+			"0.0",
+			"MainPad",
+			"InputHandler.MainPad",
+			"Movement",
+			"Left",
+			"left",
+			"Movement",
+			"LeftStick",
+			"RightStick",
+			"float",
+			"x",
+			"X",
+			"x",
+			"X",
+			"load",
+			"()",
+			"//...\n"
+		],
+		"highlight": true,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": false,
+		"replace_history":
+		[
+		],
+		"reverse": false,
+		"show_context": true,
+		"use_buffer2": true,
+		"whole_word": false,
+		"wrap": true
+	},
+	"groups":
+	[
+		{
+			"selected": 1,
+			"sheets":
+			[
+				{
+					"buffer": 0,
+					"file": "source/app.d",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 378,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								378,
+								378
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/D/D.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 2,
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"file": "source/maths/vector.d",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 1801,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								546,
+								546
+							]
+						],
+						"settings":
+						{
+							"auto_name": "",
+							"syntax": "Packages/D/D.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 0,
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"file": "dub.selections.json",
+					"semi_transient": true,
+					"settings":
+					{
+						"buffer_size": 123,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								121,
+								121
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JSON.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 3,
+					"type": "text"
+				}
+			]
+		},
+		{
+			"selected": 0,
+			"sheets":
+			[
+				{
+					"buffer": 3,
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 900,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								900,
+								900
+							]
+						],
+						"settings":
+						{
+							"bv_scroll": "top",
+							"syntax": "Packages/Text/Plain text.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 1,
+					"type": "text"
+				}
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 35.0
+	},
+	"input":
+	{
+		"height": 36.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			],
+			[
+				1,
+				0,
+				2,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			0.721192819919,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"output.exec":
+	{
+		"height": 239.0
+	},
+	"output.find_results":
+	{
+		"height": 0.0
+	},
+	"pinned_build_system": "Packages/User/DUB-Build.sublime-build",
+	"project": "drey.sublime-project",
+	"replace":
+	{
+		"height": 64.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+			[
+				"",
+				"source\\Maths\\Vector.d"
+			],
+			[
+				"app",
+				"source\\app.d"
+			],
+			[
+				"tex",
+				"source\\TextureManager.d"
+			],
+			[
+				"wok",
+				"source\\workshop.d"
+			],
+			[
+				"b",
+				"source\\BackgroundEffects.d"
+			],
+			[
+				"pp",
+				"source\\app.d"
+			],
+			[
+				"inpu",
+				"source\\InputHandler.d"
+			],
+			[
+				"ap",
+				"source\\app.d"
+			],
+			[
+				"bac",
+				"source\\BackgroundEffects.d"
+			],
+			[
+				"ba",
+				"source\\BackgroundEffects.d"
+			],
+			[
+				"inv",
+				"source\\Invaders.d"
+			],
+			[
+				"gam",
+				"source\\GameObjects.d"
+			],
+			[
+				"pl",
+				"C:\\Users\\Juan\\AppData\\Roaming\\Sublime Text 3\\Packages\\User\\DUB.sublime-build"
+			]
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 500.0,
+		"last_filter": "",
+		"selected_items":
+		[
+			[
+				"",
+				"F:\\GIT\\Squirrelatron\\squirrelatron.sublime-project"
+			]
+		],
+		"width": 380.0
+	},
+	"select_symbol":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"selected_group": 0,
+	"settings":
+	{
+	},
+	"show_minimap": true,
+	"show_open_files": false,
+	"show_tabs": true,
+	"side_bar_visible": true,
+	"side_bar_width": 193.0,
+	"status_bar_visible": true,
+	"template_settings":
+	{
+	}
+}

@@ -1,0 +1,10 @@
+{
+	"name": "drey",
+	"description": "A small D game engine based on SDL / OGL",
+	"copyright": "Copyright © 2015, Ross McKinlay",
+	"authors": ["Ross McKinlay"],
+	"dependencies": {    		
+		"derelict-sdl2": ">=1.1.9",
+		"derelict-gl3": ">=1.0.9"
+	}
+}
