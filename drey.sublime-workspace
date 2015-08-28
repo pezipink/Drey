@@ -4,6 +4,42 @@
 		"selected_items":
 		[
 			[
+				"to",
+				"toString"
+			],
+			[
+				"colo",
+				"colour"
+			],
+			[
+				"rand",
+				"RnadomColour"
+			],
+			[
+				"type",
+				"typedCsv"
+			],
+			[
+				"cool",
+				"coolStuff"
+			],
+			[
+				"al",
+				"allCases"
+			],
+			[
+				"Case",
+				"Case2"
+			],
+			[
+				"uni",
+				"unionName"
+			],
+			[
+				"case",
+				"caseParts"
+			],
+			[
 				"tex",
 				"texHeight	variable"
 			],
@@ -92,34 +128,104 @@
 	"buffers":
 	[
 		{
-			"file": "source/app.d",
-			"settings":
-			{
-				"buffer_size": 378,
-				"line_ending": "Windows"
-			}
-		},
-		{
 			"file": "source/maths/vector.d",
 			"settings":
 			{
-				"buffer_size": 1801,
+				"buffer_size": 6523,
 				"line_ending": "Windows"
 			}
 		},
 		{
-			"file": "dub.selections.json",
+			"file": "source/app.d",
 			"settings":
 			{
-				"buffer_size": 123,
-				"line_ending": "Unix"
+				"buffer_size": 6908,
+				"line_ending": "Windows"
 			}
 		},
 		{
-			"contents": "Generating test runner configuration '__test__library__' for 'library' (library).\nTarget derelict-util 1.9.1 is up to date. Use --force to rebuild.\nTarget derelict-sdl2 1.9.5 is up to date. Use --force to rebuild.\nTarget derelict-gl3 1.0.12 is up to date. Use --force to rebuild.\nBuilding drey ~master configuration \"__test__library__\", build type unittest.\nCompiling using dmd...\nvector.d(33): Error: function maths.vector.Vector!(2, float).Vector.opUnary!\"-\".opUnary.MapResult!(__lambda1, float[]).MapResult.opSlice (uint low, uint high) is not callable using argument types ()\nvector.d(96): Error: template instance maths.vector.Vector!(2, float).Vector.opUnary!\"-\" error instantiating\nFAIL ..\\..\\.dub\\build\\__test__library__-unittest-windows-x86-dmd_2067-64278FEB98FA53798AB088435E9616F1\\ __test__library__ executable\nError executing command test: dmd failed with exit code 1.\n\n[Finished in 1.1s]",
+			"file": "source/slisp.d",
 			"settings":
 			{
-				"buffer_size": 900,
+				"buffer_size": 7932,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"contents": "Searching 12 files for \"reduce\"\n\nC:\\Users\\ross\\Documents\\Drey\\source\\slisp.d:\n  130    import std.conv : to;\n  131    import std.string : join, format;\n  132:   import std.algorithm : map, reduce, castSwitch;  \n  133  \n  134    string aux(SExpression token) {\n  ...\n  160              assert(fbody, \"the last arg to fun must be an SList representing the function body\");\n  161              string sargs =\n  162:               reduce!(x=>x.name)(\"\",fargs);\n  163  \n  164              return \"f\";\n  ...\n  214    auto prelude = cast(SList)outerList[1];\n  215    assert((cast(SSymbol)prelude[0]).name == \"prelude\",(cast(SSymbol)prelude[0]).name);\n  216:   string preludeCode = reduce!((x,y)=>x ~= aux(y) ~ \";\\n\")(\"\", prelude[1..$] );\n  217  \n  218    //outerList[2] is the update section \n  219    auto update = cast(SList)outerList[2];\n  220    assert((cast(SSymbol)update[0]).name == \"update\", (cast(SSymbol)update[0]).name  );\n  221:   string updateCode = reduce!((x,y)=>x ~= aux(y)~ \";\\n\")(\"\", update[1..$] );\n  222    \n  223    return format(q{\n\nC:\\Users\\ross\\Documents\\Drey\\source\\maths\\vector.d:\n  147  \n  148  private mixin template seed() {\n  149: 	import std.algorithm : reduce;\n  150  	import std.traits : isFloatingPoint;\n  151  	static if(isFloatingPoint!(vectorType!T))\n  ...\n  166  	mixin seed;\n  167  	return	\n  168: 		reduce!((acc, x)=> acc + x * x)(seed,source[])\n  169  		.sqrt;\n  170  }\n  ...\n  176  	mixin seed;\n  177  	return	\n  178: 		reduce!((acc, x)=> acc + ((x[1] - x[0]) * (x[1] - x[0])))(seed,zip(left[],right[]))\n  179  		.sqrt;\n  180  }\n  ...\n  186  	mixin seed;\n  187  	return	\n  188: 		reduce!((acc, x)=> acc + x[0] * x[1])(seed,zip(left[],right[]));		\n  189  }\n  190  \n\n<untitled 44>:\n    5  Compiling using dmd...\n    6  C:\\D\\dmd2\\windows\\bin\\..\\..\\src\\phobos\\std\\algorithm\\iteration.d(2536): Error: static assert  \"Incompatible function/seed/element: slisp.compile.aux.__lambda4/string/SSymbol\"\n    7: C:\\D\\dmd2\\windows\\bin\\..\\..\\src\\phobos\\std\\algorithm\\iteration.d(2521):        instantiated from here: reduceImpl!(false, MapResult!(__lambda2, SExpression[]), string)\n    8: C:\\D\\dmd2\\windows\\bin\\..\\..\\src\\phobos\\std\\algorithm\\iteration.d(2505):        instantiated from here: reducePreImpl!(MapResult!(__lambda2, SExpression[]), string)\n    9: slisp.d(162):        instantiated from here: reduce!(string, MapResult!(__lambda2, SExpression[]))\n   10  FAIL ..\\.dub\\build\\application-debug-windows-x86-dmd_2067-080EF91072DC10FD4042C10FCDCFDC3B\\ drey executable\n   11  Error executing command run:\n\n11 matches across 3 files\n",
+			"settings":
+			{
+				"buffer_size": 2556,
+				"line_ending": "Windows",
+				"name": "Find Results",
+				"scratch": true
+			}
+		},
+		{
+			"contents": "Package derelict-util can be upgraded from 1.9.1 to 2.0.0.\nPackage derelict-gl3 can be upgraded from 1.0.12 to 1.0.13.\nUse \"dub upgrade\" to perform those changes.\nTarget derelict-util 1.9.1 is up to date. Use --force to rebuild.\nTarget derelict-sdl2 1.9.5 is up to date. Use --force to rebuild.\nTarget derelict-gl3 1.0.12 is up to date. Use --force to rebuild.\nBuilding drey ~master configuration \"application\", build type debug.\nCompiling using dmd...\nLinking...\nRunning ..\\drey.exe \n0\n!!\n\n  	auto angle = 0.0;\nauto delta = (rnd(10,200));\n\n\n  	while(true){\n\n  		auto add(int x,int y) {\n\n                auto z = (x+y);\nreturn (z+x);\n\n\n              };\nangle = (WRAPP((angle+0.05),360.0));\n;\npos.y = (240+((cos(angle))*delta));\npos.x = (WRAPP((pos.x+1),640));\n\n\n  		Fiber.yield;\n\n  	}\ninit 16.6667\n[Finished in 1.9s]",
+			"settings":
+			{
+				"buffer_size": 816,
+				"line_ending": "Windows",
+				"name": "Build output",
+				"scratch": true
+			}
+		},
+		{
+			"contents": "Package derelict-util can be upgraded from 1.9.1 to 2.0.0.\nPackage derelict-gl3 can be upgraded from 1.0.12 to 1.0.13.\nUse \"dub upgrade\" to perform those changes.\nTarget derelict-util 1.9.1 is up to date. Use --force to rebuild.\nTarget derelict-sdl2 1.9.5 is up to date. Use --force to rebuild.\nTarget derelict-gl3 1.0.12 is up to date. Use --force to rebuild.\nBuilding drey ~master configuration \"application\", build type debug.\nCompiling using dmd...\nLinking...\nRunning ..\\drey.exe \n0\n!!\n\n  	auto angle = 0.0;\nauto delta = (rnd(10,200));\n\n\n  	while(true){\n\n  		auto add(int x,int y) {\n\n                auto z = (x+y);\nreturn (z+x);\n\n\n              };\nangle = (WRAPP((angle+0.05),360.0));\n;\npos.y = (240+((cos(angle))*delta));\npos.x = (WRAPP((pos.x+1),640));\n\n\n  		Fiber.yield;\n\n  	}\ninit 16.6667\n[Finished in 2.9s]",
+			"settings":
+			{
+				"buffer_size": 816,
+				"line_ending": "Windows",
+				"name": "Build output",
+				"scratch": true
+			}
+		},
+		{
+			"contents": "Package derelict-util can be upgraded from 1.9.1 to 2.0.3.\nPackage derelict-sdl2 can be upgraded from 1.9.5 to 1.9.6.\nPackage derelict-gl3 can be upgraded from 1.0.12 to 1.0.15.\nUse \"dub upgrade\" to perform those changes.\nTarget derelict-util 1.9.1 is up to date. Use --force to rebuild.\nTarget derelict-sdl2 1.9.5 is up to date. Use --force to rebuild.\nTarget derelict-gl3 1.0.12 is up to date. Use --force to rebuild.\nTarget drey ~master is up to date. Use --force to rebuild.\nRunning ..\\drey.exe \n0\n!!\n\n  	auto angle = 0.0;\nauto delta = (rnd(10,200));\n\n\n  	while(true){\n\n  		auto add(int x,int y) {\n\n                auto z = (x+y);\nreturn (z+x);\n\n\n              };\nangle = (WRAPP((angle+0.05),360.0));\n;\npos.y = (240+((cos(angle))*delta));\npos.x = (WRAPP((pos.x+1),640));\n\n\n  		Fiber.yield;\n\n  	}\ninit 16.6667\nouch 10.3333 27\n[Finished in 2.6s]",
+			"settings":
+			{
+				"buffer_size": 847,
+				"line_ending": "Windows",
+				"name": "Build output",
+				"scratch": true
+			}
+		},
+		{
+			"contents": "Target derelict-util 1.9.1 is up to date. Use --force to rebuild.\nTarget derelict-sdl2 1.9.5 is up to date. Use --force to rebuild.\nTarget derelict-gl3 1.0.12 is up to date. Use --force to rebuild.\nTarget drey ~master is up to date. Use --force to rebuild.\nRunning ..\\drey.exe \n0\n!!\n\n  	auto angle = 0.0;\nauto delta = (rnd(10,200));\n\n\n  	while(true){\n\n  		auto add(int x,int y) {\n\n                auto z = (x+y);\nreturn (z+x);\n\n\n              };\nangle = (WRAPP((angle+0.05),360.0));\n;\npos.y = (240+((cos(angle))*delta));\npos.x = (WRAPP((pos.x+1),640));\n\n\n  		Fiber.yield;\n\n  	}\ninit 16.6667\n[Finished in 3.6s]",
+			"settings":
+			{
+				"buffer_size": 609,
+				"line_ending": "Windows",
+				"name": "Build output",
+				"scratch": true
+			}
+		},
+		{
+			"contents": "Package derelict-util can be upgraded from 1.9.1 to 2.0.3.\nPackage derelict-sdl2 can be upgraded from 1.9.5 to 1.9.7.\nPackage derelict-gl3 can be upgraded from 1.0.12 to 1.0.15.\nUse \"dub upgrade\" to perform those changes.\nTarget derelict-util 1.9.1 is up to date. Use --force to rebuild.\nTarget derelict-sdl2 1.9.5 is up to date. Use --force to rebuild.\nTarget derelict-gl3 1.0.12 is up to date. Use --force to rebuild.\nTarget drey ~master is up to date. Use --force to rebuild.\nRunning ..\\drey.exe \n0\n!!\n\n  	auto angle = 0.0;\nauto delta = (rnd(10,200));\n\n\n  	while(true){\n\n  		auto add(int x,int y) {\n\n                auto z = (x+y);\nreturn (z+x);\n\n\n              };\nangle = (WRAPP((angle+0.05),360.0));\n;\npos.y = (240+((cos(angle))*delta));\npos.x = (WRAPP((pos.x+1),640));\n\n\n  		Fiber.yield;\n\n  	}\ninit 16.6667\n[Finished in 6.7s]",
+			"settings":
+			{
+				"buffer_size": 831,
+				"line_ending": "Windows",
+				"name": "Build output",
+				"scratch": true
+			}
+		},
+		{
+			"contents": "Target derelict-util 1.9.1 is up to date. Use --force to rebuild.\nTarget derelict-sdl2 1.9.5 is up to date. Use --force to rebuild.\nTarget derelict-gl3 1.0.12 is up to date. Use --force to rebuild.\nTarget drey ~master is up to date. Use --force to rebuild.\nRunning ..\\..\\drey.exe \n0\n!!\n\n  	auto angle = 0.0;\nauto delta = (rnd(10,200));\n\n\n  	while(true){\n\n  		auto add(int x,int y) {\n\n                auto z = (x+y);\nreturn (z+x);\n\n\n              };\nangle = (WRAPP((angle+0.05),360.0));\n;\npos.y = (240+((cos(angle))*delta));\npos.x = (WRAPP((pos.x+1),640));\n\n\n  		Fiber.yield;\n\n  	}\ninit 16.6667\n[Finished in 1.8s]",
+			"settings":
+			{
+				"buffer_size": 612,
+				"line_ending": "Windows",
+				"name": "Build output",
+				"scratch": true
+			}
+		},
+		{
+			"contents": "Target derelict-util 1.9.1 is up to date. Use --force to rebuild.\nTarget derelict-sdl2 1.9.5 is up to date. Use --force to rebuild.\nTarget derelict-gl3 1.0.12 is up to date. Use --force to rebuild.\nTarget drey ~master is up to date. Use --force to rebuild.\nRunning ..\\drey.exe \n0\n!!\n\n  	auto angle = 0.0;\nauto delta = (rnd(10,200));\n\n\n  	while(true){\n\n  		auto add(int x,int y) {\n\n                auto z = (x+y);\nreturn (z+x);\n\n\n              };\nangle = (WRAPP((angle+0.05),360.0));\n;\npos.y = (240+((cos(angle))*delta));\npos.x = (WRAPP((pos.x+1),640));\n\n\n  		Fiber.yield;\n\n  	}\ninit 16.6667\n[Finished in 1.9s]",
+			"settings":
+			{
+				"buffer_size": 609,
 				"line_ending": "Windows",
 				"name": "Build output",
 				"scratch": true
@@ -133,17 +239,61 @@
 	"build_varint": "",
 	"command_palette":
 	{
-		"height": 265.0,
-		"last_filter": "buil",
+		"height": 588.0,
+		"last_filter": "go",
 		"selected_items":
 		[
 			[
-				"buil",
-				"Build output always at top"
+				"go",
+				"Set Syntax: Go (Colorcode)"
+			],
+			[
+				"d",
+				"Set Syntax: D"
+			],
+			[
+				"GO",
+				"Set Syntax: Go (Colorcode)"
 			],
 			[
 				"D",
 				"Set Syntax: D"
+			],
+			[
+				"top",
+				"Build output always at top"
+			],
+			[
+				"can",
+				"Build: Cancel"
+			],
+			[
+				"bui",
+				"Build: Cancel"
+			],
+			[
+				"b",
+				"Build output always at top"
+			],
+			[
+				"wra",
+				"Word Wrap: Toggle"
+			],
+			[
+				"list",
+				"Package Control: List Packages"
+			],
+			[
+				"bu",
+				"Build output always at top"
+			],
+			[
+				"up",
+				"Build output always at top"
+			],
+			[
+				"buil",
+				"Build output always at top"
 			],
 			[
 				"si",
@@ -178,14 +328,6 @@
 				"Build output always at top"
 			],
 			[
-				"d",
-				"Set Syntax: D"
-			],
-			[
-				"wra",
-				"Word Wrap: Toggle"
-			],
-			[
 				"upper",
 				"Convert Case: Upper Case"
 			],
@@ -206,7 +348,7 @@
 				"Package Control: Install Package"
 			]
 		],
-		"width": 377.0
+		"width": 684.0
 	},
 	"console":
 	{
@@ -227,12 +369,13 @@
 	},
 	"expanded_folders":
 	[
-		"/F/GIT/Drey",
-		"/F/GIT/Drey/source",
-		"/F/GIT/Drey/source/maths"
+		"/C/Users/ross/Documents/Drey"
 	],
 	"file_history":
 	[
+		"/C/Users/ross/Documents/fsharp/src/fsharp/est.fs",
+		"/C/Users/ross/Documents/Drey/drey.sublime-project",
+		"/C/Users/ross/Documents/Drey/source/app.d",
 		"/F/GIT/Drey/source/maths/vector.d",
 		"/F/GIT/Squirrelatron/source/Vector2D.d",
 		"/F/GIT/Squirrelatron/source/Vector.d",
@@ -262,13 +405,14 @@
 	],
 	"find":
 	{
-		"height": 27.0
+		"height": 38.0
 	},
 	"find_in_files":
 	{
 		"height": 93.0,
 		"where_history":
 		[
+			""
 		]
 	},
 	"find_state":
@@ -276,6 +420,20 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"(",
+			";",
+			"reduce",
+			"Target",
+			"define",
+			"prag",
+			"paral",
+			"uniform",
+			"\";\n",
+			"_scr.pitch / 4",
+			"int",
+			"y",
+			"pair",
+			"arity",
 			"TL",
 			"isFloatVector",
 			"this.data",
@@ -340,56 +498,61 @@
 			[
 				{
 					"buffer": 0,
-					"file": "source/app.d",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 378,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								378,
-								378
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/D/D.tmLanguage"
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 2,
-					"type": "text"
-				},
-				{
-					"buffer": 1,
 					"file": "source/maths/vector.d",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 1801,
+						"buffer_size": 6523,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								546,
-								546
+								1198,
+								1198
 							]
 						],
 						"settings":
 						{
 							"auto_name": "",
-							"syntax": "Packages/D/D.tmLanguage"
+							"colorcode": true,
+							"syntax": "Packages/Colorcoder/Go (Colorcoded).tmLanguage",
+							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 0.0,
+						"translation.y": 1404.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 1,
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"file": "source/app.d",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 6908,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								5565,
+								5565
+							]
+						],
+						"settings":
+						{
+							"colorcode": true,
+							"syntax": "Packages/Colorcoder/Go (Colorcoded).tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 4930.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 0,
@@ -397,64 +560,323 @@
 				},
 				{
 					"buffer": 2,
-					"file": "dub.selections.json",
-					"semi_transient": true,
+					"file": "source/slisp.d",
+					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 123,
+						"buffer_size": 7932,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								121,
-								121
+								4206,
+								4206
 							]
 						],
 						"settings":
 						{
-							"syntax": "Packages/JavaScript/JSON.tmLanguage"
+							"colorcode": true,
+							"syntax": "Packages/Colorcoder/Go (Colorcoded).tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 0.0,
+						"translation.y": 3909.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 3,
 					"type": "text"
-				}
-			]
-		},
-		{
-			"selected": 0,
-			"sheets":
-			[
+				},
 				{
 					"buffer": 3,
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 900,
+						"buffer_size": 2556,
+						"regions":
+						{
+							"match":
+							{
+								"flags": 112,
+								"regions":
+								[
+									[
+										189,
+										195
+									],
+									[
+										426,
+										432
+									],
+									[
+										673,
+										679
+									],
+									[
+										955,
+										961
+									],
+									[
+										1177,
+										1183
+									],
+									[
+										1331,
+										1337
+									],
+									[
+										1454,
+										1460
+									],
+									[
+										1614,
+										1620
+									],
+									[
+										2036,
+										2042
+									],
+									[
+										2211,
+										2217
+									],
+									[
+										2324,
+										2330
+									]
+								],
+								"scope": ""
+							}
+						},
+						"selection":
+						[
+							[
+								32,
+								32
+							]
+						],
+						"settings":
+						{
+							"colorcode": true,
+							"detect_indentation": false,
+							"line_numbers": false,
+							"output_tag": 1,
+							"result_base_dir": "",
+							"result_file_regex": "^([A-Za-z\\\\/<].*):$",
+							"result_line_regex": "^ +([0-9]+):",
+							"scroll_past_end": true,
+							"syntax": "Packages/Default/Find Results.hidden-tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 10,
+					"type": "text"
+				}
+			]
+		},
+		{
+			"selected": 5,
+			"sheets":
+			[
+				{
+					"buffer": 4,
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 816,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								900,
-								900
+								816,
+								816
 							]
 						],
 						"settings":
 						{
 							"bv_scroll": "top",
+							"colorcode": true,
 							"syntax": "Packages/Text/Plain text.tmLanguage"
 						},
 						"translation.x": 0.0,
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 1,
+					"stack_index": 9,
+					"type": "text"
+				},
+				{
+					"buffer": 5,
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 816,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								816,
+								816
+							]
+						],
+						"settings":
+						{
+							"colorcode": true,
+							"syntax": "Packages/Text/Plain text.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 819.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 8,
+					"type": "text"
+				},
+				{
+					"buffer": 6,
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 847,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								847,
+								847
+							]
+						],
+						"settings":
+						{
+							"colorcode": true,
+							"syntax": "Packages/Text/Plain text.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 819.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 6,
+					"type": "text"
+				},
+				{
+					"buffer": 7,
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 609,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								609,
+								609
+							]
+						],
+						"settings":
+						{
+							"colorcode": true,
+							"syntax": "Packages/Text/Plain text.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 159.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 5,
+					"type": "text"
+				},
+				{
+					"buffer": 8,
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 831,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								831,
+								831
+							]
+						],
+						"settings":
+						{
+							"colorcode": true,
+							"syntax": "Packages/Text/Plain text.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 792.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 4,
+					"type": "text"
+				},
+				{
+					"buffer": 9,
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 612,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								612,
+								612
+							]
+						],
+						"settings":
+						{
+							"colorcode": true,
+							"syntax": "Packages/Text/Plain text.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 576.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 2,
+					"type": "text"
+				},
+				{
+					"buffer": 10,
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 609,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								609,
+								609
+							]
+						],
+						"settings":
+						{
+							"colorcode": true,
+							"syntax": "Packages/Text/Plain text.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 576.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 7,
 					"type": "text"
 				}
 			]
@@ -462,7 +884,7 @@
 	],
 	"incremental_find":
 	{
-		"height": 35.0
+		"height": 49.0
 	},
 	"input":
 	{
@@ -488,7 +910,7 @@
 		"cols":
 		[
 			0.0,
-			0.721192819919,
+			0.715984486586,
 			1.0
 		],
 		"rows":
@@ -506,11 +928,11 @@
 	{
 		"height": 0.0
 	},
-	"pinned_build_system": "Packages/User/DUB-Build.sublime-build",
+	"pinned_build_system": "Packages/User/DUB.sublime-build",
 	"project": "drey.sublime-project",
 	"replace":
 	{
-		"height": 64.0
+		"height": 72.0
 	},
 	"save_all_on_build": true,
 	"select_file":
@@ -520,12 +942,16 @@
 		"selected_items":
 		[
 			[
-				"",
-				"source\\Maths\\Vector.d"
-			],
-			[
 				"app",
 				"source\\app.d"
+			],
+			[
+				"li",
+				"source\\slisp.d"
+			],
+			[
+				"",
+				"drey.sublime-project"
 			],
 			[
 				"tex",
@@ -576,16 +1002,24 @@
 	},
 	"select_project":
 	{
-		"height": 500.0,
+		"height": 750.0,
 		"last_filter": "",
 		"selected_items":
 		[
 			[
 				"",
-				"F:\\GIT\\Squirrelatron\\squirrelatron.sublime-project"
+				"C:\\Users\\ross\\Documents\\Squirrelatron\\squirreltron.sublime-project"
+			],
+			[
+				"p",
+				"C:\\Users\\ross\\Documents\\Squirrelatron\\source\\phobos.sublime-project"
+			],
+			[
+				"ph",
+				"C:\\Users\\ross\\Documents\\Squirrelatron\\source\\phobos.sublime-project"
 			]
 		],
-		"width": 380.0
+		"width": 570.0
 	},
 	"select_symbol":
 	{
@@ -603,11 +1037,10 @@
 	"show_minimap": true,
 	"show_open_files": false,
 	"show_tabs": true,
-	"side_bar_visible": true,
+	"side_bar_visible": false,
 	"side_bar_width": 193.0,
 	"status_bar_visible": true,
 	"template_settings":
 	{
 	}
 }
- 

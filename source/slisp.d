@@ -41,16 +41,17 @@ class SFloat : SExpression {
 	this(float _value, string _svalue) {value=_value; svalue=_svalue;}
 	override string toString() { return svalue; }
 }
-class SString : SExpression {
-	string value;
-	this(string _value) {value=_value;}
-	override string toString() { import std.format; return format("\"%s\"",value); }
-}
+// class SString : SExpression {
+// 	string value;
+// 	this(string _value) {value=_value;}
+// 	override string toString() { import std.format; return format("\"%s\"",value); }
+// }
 
 class SSymbol : SExpression {
 	string name;
 	this(string _value) {name=_value;}
 	override string toString() { return name; }
+  alias name this;
 }
 
 auto tokenize(string input) {
@@ -62,7 +63,7 @@ auto tokenize(string input) {
       .replace("(", " ( ")
       .replace(")", " ) ")      
       .split(" ")
-      .map!(strip)
+      .map!strip
       .filter!(x => x != "")
       .array;
 }
@@ -84,9 +85,9 @@ SExpression parse(string[] tokens) {
   SExpression aux() {
 	  auto token = tokens[0];
 	  tokens = tokens[1..$];
-	  switch( token ) {
-	    case "(" :
-	      auto next = new SList();
+    switch( token ) {
+      case "(" :
+        auto next = new SList();
 	      while(tokens[0] != ")")
 	         next ~= aux();
 	      tokens = tokens[1..$];
@@ -100,11 +101,13 @@ SExpression parse(string[] tokens) {
   return aux();
 }
 
+
 struct function_data{
   string type;
   int minargs;
   int maxargs;
 }
+
 
 enum function_map = 
   [ "-" : function_data("op",1,2),
@@ -123,6 +126,12 @@ enum function_map =
     "sin" :function_data("func",1,1)
   ];
 
+struct Environment {
+  string[int] scopedVariables;
+  string[SExpression] macroDefs;
+
+} 
+
 alias rnd = std.random.uniform;
 
 string compile(SExpression tokens) {
@@ -137,18 +146,44 @@ string compile(SExpression tokens) {
 	  	return x.to!string;
   	} else if(auto x = cast(SFloat)token) {
 	  	return x.to!string;
-  	} else if(auto x = cast(SString)token) {
-	  	return format("\"%s\"", x);
+  	// } else if(auto x = cast(SString)token) {
+	  // 	return format("\"%s\"", x);
   	} else if(auto x = cast(SSymbol)token){
 	  	return x.name;
   	} else if(auto tks = cast(SList)token){
   		// todo: handle empty lists?  		
+      auto nestedList = cast(SList)tks[0];
+      if(nestedList) return reduce!((x,y)=>x ~= aux(y)~ ";\n")("", tks );
   		auto symbol = cast(SSymbol)tks[0];
-		assert(symbol, "lists must begin with a symbol");
-		switch(symbol.name){
-			//handle special forms
-	        case "define":
+		  assert(symbol, "lists must begin with a symbol, not " ~ tks[0].stringof );
+		  switch(symbol.name){
+          //handle special forms
+	        case "ret":
+            assert(tks.length==2, "ret expects only one expression");
+            return format("return %s",aux(tks[1]));
+          case "list": assert(false,"list may only be used during macro-expansion");
+          case "let":
 	          return format("auto %s = %s",aux(tks[1]), aux(tks[2]));
+          case "fun":
+            import std.algorithm:each,count;
+            import std.typecons;
+            import std.array;
+            auto fname = cast(SSymbol)tks[1];
+            auto fargs = tks[2..$-1].map!(x=>cast(SSymbol)x);
+            fargs.each!(x=>assert(x,"arguments to function '" ~ fname ~ "'' were not all symbols"));
+            auto splitArgs = fargs.map!(x=> {
+                auto split = x.name.split!(x=>x==':');
+                assert(split.length == 2,"arguments for function '" ~ fname ~ "' must be annotated in the format name:type until I write some type inference");
+                return split[1] ~ " " ~ split[0];
+              }());
+            auto fbody = cast(SList)tks[$-1];
+            assert(fname && fname.name != "", "fun [0] should be a symbol representing the function name");
+            assert(fbody, "the last arg to fun must be an SList representing the function body");
+            auto sargs = splitArgs.join(","); 
+            return format(
+              q{auto %s(%s) {
+                %s
+              }},fname.name, sargs, aux(fbody) );
 	        case "if":
 	          	return
 	                format(
@@ -163,9 +198,9 @@ string compile(SExpression tokens) {
 	                  aux(tks[3]));                
             case "set":
             	auto fargs = tks[1..$];
-        		assert(fargs.length == 2, "function 'set' requires two arguments");
-        		auto var = cast(SSymbol)fargs[0];
-        		assert(var, "the first argument to 'set' must be a variable");
+        		  assert(fargs.length == 2, "function 'set' requires two arguments");
+        		  auto var = cast(SSymbol)fargs[0];
+        		  assert(var, "the first argument to 'set' must be a variable");
             	return format(q{%s = %s}, var.name, aux(fargs[1]) );
 	        
 	        // all other symbols

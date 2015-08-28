@@ -21,17 +21,25 @@ class Attacker  : Fiber {
   vec2 vel = vec2(0.1,0.0);
   int time;
   this() {
-
       super(&update);
       pos = vec2(uniform(0,300),0.0);
   }
   void update(){
+          auto add(int x,int y) {
+
+                auto z = (x+y);
+return (z+x);
+
+
+              }
+
     mixin(
       "(basicAttack
         (prelude 
-          (define angle 0.0) 
-          (define delta (rnd 10 200)))
+          (let angle 0.0) 
+          (let delta (rnd 10 200)))
         (update
+
           (set angle (WRAPP (+ angle 0.5) 360.0))
           (set pos.y (+ 240 (* (cos angle) delta)))
           (set pos.x (WRAPP (+ pos.x 1) 640 ))))
@@ -171,13 +179,16 @@ public:
 
 import slisp;
 void main(){
-  wl(std.conv.to!float("0.0"));
+  wl(std.conv.to!float("0.0")); 
   enum tokens = "(basicAttack
                   (prelude 
-                    (define angle 0.0) 
-                    (define delta (rnd 10 200)))
+                    (let angle 0.0) 
+                    (let delta (rnd 10 200)))
                   (update
-                    (set angle (WRAPP (+ angle 0.05) 360.0))
+                    (fun add x:int y:int (
+                      (let z (+ x y))
+                      (ret (+ z x))))
+                    ((set angle (WRAPP (+ angle 0.05) 360.0)))
                     (set pos.y (+ 240 (* (cos angle) delta)))
                     (set pos.x (WRAPP (+ pos.x 1) 640 ))))
                   ".tokenize();
@@ -193,9 +204,9 @@ void main(){
   // wl(PrintExpression(p));
   // mixin("(test1
   //         (prelude 
-  //           (define speed (rnd 10 200))
-  //           (define width 50)
-  //           (define height 50))
+  //           (let speed (rnd 10 200))
+  //           (let width 50)
+  //           (let height 50))
   //         (update
   //           (set vel.x speed)(set vel.y 0)
   //           (wait (delta pos.x width))
