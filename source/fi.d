@@ -276,16 +276,6 @@ template flatten(alias mapper = "a")
 	}
 }
 
-template choose(alias mapper, alias filter = "a !is null") 
-{
-	auto flatten(Range)(Range r) 
-	{
-		import std.algorithm : map, filter;
-		return r.filter!(filter).map!(mapper);
-	}
-}
-
-
 
 class Player
 {
@@ -424,7 +414,7 @@ class ForbiddenIsland
 		islandTiles.shuffle;
 		floodDeck.shuffle;
 		waterLevel = initialWaterLevel;
-		
+
 		// distribute 2 treasure cards to each player
 		foreach(role; roles)
 		{
