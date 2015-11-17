@@ -18,7 +18,44 @@ template DU(string S) {
 		{
 			return this.fields.map!(x=>format("%s %s;",x[1],x[0]).strip).join("\n");
 		}
-	
+		
+		auto toStringMethod(Tuple!(string,string,string)[] superCtorFields )
+		{
+			// return "public override string toString() { return \"ross\"; } ";
+			string str; 
+			auto fields = chain(superCtorFields, this.fields).array;
+			// auto fields = this.fields;
+			if(fields.length == 0)
+			{
+				str = "\"" ~ this.className ~ "\""; 
+			}
+			else
+			{
+				str = "\"" ~ this.className ~ " : \" ";
+			}
+			foreach(i,tup; fields)
+			{
+				auto field = tup[0].strip;
+				if(i==0)
+				{
+					str ~= "\"" ~ field ~ " => (\" ~ to!string(this." ~ field ~ ") ~ \" )\" ";
+				}
+				else
+				{
+					str ~= " ~ \", " ~ field ~ " => (\" ~ to!string(this." ~ field ~ ") ~ \" )\" ";
+				}
+
+			}				
+			return q{
+				public override string toString()
+				{
+					import std.conv : to;
+					string str = %s ;
+					return str;
+				}
+			}.format(str);
+		}
+
 		@property auto derivedAlias()
 		{
 			return format("import std.meta : AliasSeq; alias __derivedTypes = AliasSeq!(%s);",
@@ -243,11 +280,13 @@ template DU(string S) {
 			q{%s final class %s : %s {
 			   %s
 			   %s
+			   %s
 			}} ;
 		
 	 	string derived;
 	 	foreach(d;at.derivedTypes) {
 	 		auto attributes = createAttributes(d.attributeMap);
+	 		auto tostring = d.toStringMethod(at.fields);
 	 		auto fields = d.fieldString;
 	 		auto ctorParams = d.ctorParamString(at.fields);
 	 		auto ctorBody = d.ctorBodyString;
@@ -256,7 +295,8 @@ template DU(string S) {
 	 			ctorBody ~= format("super(%s);",at.fields.map!(x=>x[0]).join(","));
 	 		}
 			auto classDef = format("%s\nthis(%s){%s}",fields,ctorParams,ctorBody);
-			derived ~= format(derivedTemplate,attributes,d.className,at.className,classDef,d.tagMethod(false));
+					import std.string : format;
+			derived ~= format(derivedTemplate,attributes,d.className,at.className,classDef,d.tagMethod(false),tostring);
 	 	}
 	 	if( !__ctfe)
 	 	{
