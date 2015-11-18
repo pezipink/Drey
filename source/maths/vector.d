@@ -294,7 +294,7 @@ unittest {
 unittest{
 import std.stdio;
 	auto a  = (1,"john",4);
-	writeln(typeid(a), " -> ", a);
+//	writeln(typeid(a), " -> ", a);
 	assert(true);
 }
 

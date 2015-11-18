@@ -34,7 +34,6 @@ mixin(DU!q{
 private auto toText(ActionMode mode)  
 {
   if(mode.IsNoneActionMode) return "None";
-  if(mode.IsNoneActionMode) return "None";
   if(mode.IsMoveActionMode) return "Move";
   if(mode.IsShoreUpActionMode) return "ShoreUp";
   if(mode.IsTradeActionMode) return "Trade";
@@ -840,7 +839,7 @@ public:
             }
             else
             {
-             Mix_PlayChannel(1,sunk,0); 
+              Mix_PlayChannel(1,sunk,0); 
             }
           }
           else if(action.IsDrawTreasure)
@@ -856,7 +855,7 @@ public:
         waitingOnUser = false;
       }
       // handle Navigator and stranded special cases here
-      else if(auto move = currentMode.AsMoveActionMode)
+      if(auto move = currentMode.AsMoveActionMode)
       {
         wl("mode is move.. x is ", x, " and y is ", y);
         int playerIndex = -1;
@@ -879,9 +878,8 @@ public:
 
         if(    playerIndex > -1
             && _fi.players.length > playerIndex  
-            && _fi.players[playerIndex].role != move.role
-            //&& currentActions.any!(x=>x.source != move.role)
-            )
+            // && _fi.players[playerIndex].role != move.role
+            && currentActions.any!(x=>x.source != move.role ))          
         {  
         wl("switxching to player", _fi.players[playerIndex].role);          
           move.role = _fi.players[playerIndex].role;

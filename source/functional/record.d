@@ -34,7 +34,7 @@ module record;
 	
 //	auto y = Person(42,"dave");
 
-//	// structual equality
+//	// structual equality  
 //	assert(y == x);
 
 //	// mutable records 

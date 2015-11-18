@@ -276,6 +276,16 @@ template flatten(alias mapper = "a")
 	}
 }
 
+template choose(alias mapper, alias filter = "a !is null") 
+{
+	auto flatten(Range)(Range r) 
+	{
+		import std.algorithm : map, filter;
+		return r.filter!(filter).map!(mapper);
+	}
+}
+
+
 
 class Player
 {
@@ -407,14 +417,15 @@ class ForbiddenIsland
 		assert(0);
 	}
 	
-	void initialize(Role[] roles, int initialWaterLevel)
+	void initialize(Role[] roles, int initialWaterLevel, bool shuffle = true)
 	{
 		state = GameState.InProgress;
-		treasureDeck.shuffle;
-		islandTiles.shuffle;
-		floodDeck.shuffle;
-		waterLevel = initialWaterLevel;
-
+		if(shuffle)
+		{
+			treasureDeck.shuffle;
+			islandTiles.shuffle;
+			floodDeck.shuffle;
+		}
 		// distribute 2 treasure cards to each player
 		foreach(role; roles)
 		{
@@ -504,7 +515,7 @@ class ForbiddenIsland
 				break;
 			}
 		}
-
+		islandTiles.items.each!(x=>x.Status = LocationStatus.Surface);
 		// draw and resolve the first 6 flood cards
 		floodDeck.draw(6).each!(card=>resolveFloodCard(getLocation(card)));
 
@@ -834,7 +845,7 @@ class ForbiddenIsland
 					foreach(tup;getAvailableTiles(p))
 					{
 						// everyone can move and shore up adjacent if the tile is not sunk
-						// TODO: Diver's movement....
+						// TODO: Diver's movement....						
 						if(tup[1].Status != LocationStatus.Sunk) currentActions ~= new Move(p.role,p.role,tup[1],true);
 					}	
 				}
@@ -917,43 +928,44 @@ class ForbiddenIsland
 			//but can move the explorer in diagonals and the diver with this movement (todo)
 			if(p.role.IsNavigator)
 			{
-				auto firstTiles =
-					players
-						.filter!(x=>!x.role.IsNavigator)
-						.map!(x=>
-							{
-								if(x.role.IsDiver)
-								{
-									// first tile for the diver can be sunken
-									return
-										getAvailableTiles(x)
-										.map!(y=>tuple(x,y[1],new Move(p.role,x.role,y[1],false)))
-										.array;
-								}
-								else
-								{
-									return
-										getAvailableTiles(x)
-										.filter!(y=>y[1].Status != LocationStatus.Sunk)
-										.map!(y=>tuple(x,y[1],new Move(p.role,x.role,y[1],false)))
-										.array;
-								}}())
-						.flatten;
-					
-					auto secondTiles =
-						firstTiles
-							.map!(x=> GetMovement(x[1],x[0].role.IsNavigator ? allDirections : orthogonal)
-											  .filter!(y=>y[1].Status != LocationStatus.Sunk)
-											  .map!(y=>new Move(p.role,x[0].role,y[1],false)))
-							.flatten;
+				// rewrote this whole thing from functional to imperatively as its way easier and makes more sense!
 
-					firstTiles
-						.filter!(x=>x[1].Status != LocationStatus.Sunk)
-						.each!(x=>currentActions ~= x[2]);
+				int[Tuple!(Location,Role)] processedTiles;
 
-					secondTiles.each!(x=>currentActions ~= x);
+				foreach(player;players.filter!(x=>!x.role.IsNavigator))
+				{
+					Location[] firstTiles;
+					foreach(tile;getAvailableTiles(player))
+					{
+						auto pair = tuple(tile[1],player.role);
+						if(pair in processedTiles) continue;
+						
+						if(pair[0].Status == LocationStatus.Sunk && !player.role.IsDiver)
+							continue;
 
-					writefln("navigator has %s extra moves", firstTiles.length + secondTiles.length );  
+						currentActions ~= new Move(p.role,player.role,pair[0],false);
+
+						firstTiles ~= pair[0];
+
+						processedTiles[pair] = 1;
+					}
+
+					foreach(loc;firstTiles)
+					{
+						foreach(tile;GetMovement(loc,player.role.IsExplorer ? allDirections : orthogonal))
+						{
+							auto pair = tuple(tile[1],player.role);
+							
+							if(		pair in processedTiles 
+								 || pair[0].Status == LocationStatus.Sunk 
+								 || pair[0] == player.location)
+								continue;
+
+							currentActions ~= new Move(p.role,player.role,pair[0],false);
+							processedTiles[pair] = 1;
+						}
+					}
+				}
 			}
 
 			if(p.role.IsPilot && !p.usedAbility)
@@ -1014,5 +1026,72 @@ class ForbiddenIsland
 		return currentActions;
 
 	}
+
+}
+
+
+
+
+// woooooo tests!
+
+// non-shuffled island layout : 
+//[
+//	[null, 						null, 				 		fi.BreakersBridge, fi.CliffsOfAbandon, null, 					 		 null], 
+//	[null, 						fi.LostLagoon, 		fi.MistyMarsh, 			fi.Observatory, 	 fi.PhantomRock,	 	 null], 
+//	[fi.GoldGate, 		fi.SilverGate, 		fi.FoolsLanding, 		fi.IronGate, 			 fi.TempleOfTheMoon, fi.TempleOfTheSun],
+//  [fi.CaveOfEmbers, fi.CaveOfShadows, fi.CoralPalace, 		fi.TidalPalace, 	 fi.HowlingGarden, 	 fi.WhisperingGarden], 
+//	[null, 						fi.TwilightHollow,fi.Watchtower, 			fi.BronzeGate, 		 fi.CopperGate, 		 null], 
+//	[null, 						null, 						fi.CrimsonForest, 	fi.DunesOfDeception,null, 						 null]
+
+//]
+unittest // role start locations are correct 
+{
+	auto fi = new ForbiddenIsland();
+	auto nav = new Navigator();
+	auto eng =  new Engineer();
+	auto pi = new Pilot();
+	auto exp = new Explorer();
+	auto mes = new Messenger();
+	auto div = new Diver();
+	fi.initialize([nav,eng,pi,exp,mes,div],3,false);
+	assert(fi.players[0].location.__tag == GoldGate.stringof ,fi.players[0].location.__tag);
+	assert(fi.players[1].location.__tag == BronzeGate.stringof,fi.players[1].location.__tag );
+	assert(fi.players[2].location.__tag == FoolsLanding.stringof ,fi.players[2].location.__tag );
+	assert(fi.players[3].location.__tag == CopperGate.stringof ,fi.players[3].location.__tag );
+	assert(fi.players[4].location.__tag == SilverGate.stringof ,fi.players[4].location.__tag );
+	assert(fi.players[5].location.__tag == IronGate.stringof ,fi.players[5].location.__tag );
+
+}
+
+unittest // navigators movement 
+{
+	auto fi = new ForbiddenIsland();
+	auto nav = new Navigator();
+	auto exp =  new Explorer();
+	fi.initialize([nav,exp],3,false);
+	// check the navigator can move the explorer twice in all directions
+	auto expected =
+		[BronzeGate.stringof,
+		 CoralPalace.stringof,
+		 CrimsonForest.stringof,
+		 DunesOfDeception.stringof,
+		 FoolsLanding.stringof,
+		 HowlingGarden.stringof,
+		 IronGate.stringof,
+		 TempleOfTheMoon.stringof,
+		 TempleOfTheSun.stringof,
+		 TidalPalace.stringof,
+		 Watchtower.stringof,
+		 WhisperingGarden.stringof];
+	assert(
+			fi.GetAvailableActions(nav)
+			.filter!(x=>x.IsMove)
+			.map!(x=>x.AsMove)
+			.filter!(x=>x.target.IsExplorer)
+			.map!(x=>x.destination)
+			.array
+			.sort!((x,y)=>x.__tag < y.__tag)
+			.array
+			.equal!((x,y)=>x.__tag == y)(expected));
 
 }

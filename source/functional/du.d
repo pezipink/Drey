@@ -198,7 +198,7 @@ template DU(string S) {
 			attributeMap = 
 				leftSide[2..lastParen]
 				.parseAttributes;
-			className = leftSide[lastParen+1..$];			
+			className = leftSide[lastParen+1..$].strip;			
 		}
 		else
 		{
