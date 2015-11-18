@@ -998,10 +998,10 @@ class ForbiddenIsland
 					string card;
 					final switch(arti.__tag())
 					{
-						case "EarthArtifact": card = "Earth"; break;
-						case "FireArtifact": card = "Fire"; break;
-						case "WindArtifact": card = "Wind"; break;
-						case "WaterArtifact": card = "Water"; break;
+						case EarthArtifact.stringof: card = "Earth"; break;
+						case FireArtifact.stringof: card = "Fire"; break;
+						case WindArtifact.stringof: card = "Wind"; break;
+						case WaterArtifact.stringof: card = "Water"; break;
 					}
 
 					auto treasures = p.treasureHand.items.filter!(x=>x.__tag() == card).array;
@@ -1083,6 +1083,7 @@ unittest // navigators movement
 		 TidalPalace.stringof,
 		 Watchtower.stringof,
 		 WhisperingGarden.stringof];
+
 	assert(
 			fi.GetAvailableActions(nav)
 			.filter!(x=>x.IsMove)
