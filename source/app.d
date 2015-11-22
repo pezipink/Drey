@@ -151,7 +151,7 @@ public:
     sunk  = Mix_LoadWAV(r"sounds\sunk.wav");
     alert   = Mix_LoadWAV(r"sounds\alert.wav");
     assert(swoosh);
-    _fi.initialize([new Navigator(),  new Engineer()],3);
+    _fi.initialize([new Navigator(),  new Diver()],3);
     gameRunning = true;
   };
   
@@ -830,7 +830,7 @@ public:
         }
         else
         {
-          _fi.ProcessAction(*action);
+          
           if(auto flood = action.AsTileFloods)
           {
             if(flood.destination.Status == LocationStatus.Surface)
@@ -844,20 +844,19 @@ public:
           }
           else if(action.IsDrawTreasure)
           {
-            Mix_PlayChannel(1,swoosh,0); 
-            if(_fi.players.flatten!(x=>x.treasureHand.items).any!(x=>x.IsWatersRise))
-            {
-              Mix_PlayChannel(2,alert,0); 
-            }
+            Mix_PlayChannel(1,swoosh,0);             
           }
-
+          _fi.ProcessAction(*action);
+          if(_fi.players.map!(x=>x.treasureHand.items).joiner.any!(x=>x.IsWatersRise))
+          {
+            Mix_PlayChannel(2,alert,0); 
+          }
         } 
         waitingOnUser = false;
       }
       // handle Navigator and stranded special cases here
       if(auto move = currentMode.AsMoveActionMode)
       {
-        wl("mode is move.. x is ", x, " and y is ", y);
         int playerIndex = -1;
         if(x == 0 && y == 1)
         {
@@ -875,13 +874,11 @@ public:
         {
           playerIndex = 3;
         }
-
         if(    playerIndex > -1
             && _fi.players.length > playerIndex  
-            // && _fi.players[playerIndex].role != move.role
-            && currentActions.any!(x=>x.source != move.role ))          
+            && _fi.players[playerIndex].role != move.role
+            )          
         {  
-        wl("switxching to player", _fi.players[playerIndex].role);          
           move.role = _fi.players[playerIndex].role;
           updateLocationActionMap();
         }

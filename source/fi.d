@@ -13,6 +13,9 @@ enum Direction { North, NorthEast, East, SouthEast, South, SouthWest, West, Nort
 enum orthogonal = [Direction.North,Direction.South,Direction.East,Direction.West];
 enum diagonal =  [Direction.NorthEast,Direction.NorthWest,Direction.SouthEast,Direction.SouthWest];
 enum allDirections = orthogonal ~ diagonal;  
+
+alias muggiiii(alias mapper) = try_transform!(mapper, x=>x !is null);
+
 mixin(DU!q{
 	@(SourceImage("fi.jpg",409,585))
 	Role =	
@@ -44,23 +47,20 @@ mixin(
 DU!q{
 	@(Quantity(5), SourceImage("fi.jpg",409,585), BackImage(3,8))
 	Treasure =
-  	| @(FrontImage(2,7)) 
-  		Earth
-  	| @(FrontImage(2,5)) 
+	| @(FrontImage(2,7)) 
+		Earth
+	| @(FrontImage(2,5)) 
 		Fire
 	| @(FrontImage(2,4)) 
 		Water
 	| @(FrontImage(2,6)) 
 		Wind
-  	| @(Quantity(3),
-  		FrontImage(2,9)) 
-  		HelicopterLift        
-  	| @(Quantity(2),
-  		FrontImage(2,8)) 
-  		SandBag 
-  	| @(Quantity(3),
-  		FrontImage(3,0)) 
-  		WatersRise	
+	| @(Quantity(3),FrontImage(2,9)) 
+		HelicopterLift        
+	| @(Quantity(2),FrontImage(2,8)) 
+		SandBag 
+	| @(Quantity(3),FrontImage(3,0)) 
+		WatersRise	
 });
 
 mixin(
@@ -266,25 +266,15 @@ template createDeck(DU)
 	}
 }
 
-template flatten(alias mapper = "a") 
-{
-	auto flatten(Range)(Range r) 
-	{
-		import std.algorithm : map;
-		import std.range : join;
-		return r.map!(mapper).join;
-	}
-}
-
-template choose(alias mapper, alias filter = "a !is null") 
-{
-	auto flatten(Range)(Range r) 
-	{
-		import std.algorithm : map, filter;
-		return r.filter!(filter).map!(mapper);
-	}
-}
-
+// template flatten(alias mapper = "a") 
+// {
+// 	auto flatten(Range)(Range r) 
+// 	{
+// 		import std.algorithm : map;
+// 		import std.range : join;
+// 		return r.map!(mapper).join;
+// 	}
+// }
 
 
 class Player
@@ -526,7 +516,7 @@ class ForbiddenIsland
 		
 		if(	   claimedArtifacts.length == 4 
 			&& players.all!(x => x.location.IsFoolsLanding)
-			&& players.flatten!(x=>x.treasureHand.items).any!(x=>x.IsHelicopterLift))
+			&& players.map!(x=>x.treasureHand.items).joiner.any!(x=>x.IsHelicopterLift))
 		{
 			state = GameState.Won;
 			return;
@@ -807,17 +797,47 @@ class ForbiddenIsland
 		return GetAvailableActions(CurrentRole);
 	}
 
+	
 	auto GetAvailableActions(Role role)
-	{
+	{				
 		if(currentActions.length>0)
 		{
 			return currentActions;
 		}
 
-		//TODO: The diver can move orthogonally across any amount of sinking or sunk tiles to land 
-		// on a sinking or surfaced tiles  for 1 action
+		void DiversMovment(Role diver, ref int[Location] seenTiles, Location currentLocation, ref Action[] moves)
+		{
+			// the diver can move through any amount of adjacent sinking or sunk tiles to land
+			// on a sinking or surfaced tile.  He may also change directions during this move.			
+			Location[] swim;			
+			foreach(tup;GetMovement(currentLocation,orthogonal))
+			{
+				auto loc = tup[1];
 
-		//TODO: the navigator can move anyone up to *2* orthogonal tiles for 1 action
+				if(loc in seenTiles)
+					continue;				
+
+				seenTiles[loc]=1;
+
+				if(loc.Status != LocationStatus.Sunk)
+				{					
+					moves ~= new Move(diver,diver,loc,false);
+				}
+
+				if(loc.Status != LocationStatus.Surface)
+				{
+
+					swim ~= loc;
+				}
+			}
+
+			if(swim.length > 0)
+			{
+				swim.each!(x=>DiversMovment(diver,seenTiles,x,moves));
+			}
+		}
+
+		// the navigator can move anyone up to *2* orthogonal tiles for 1 action
 		// represent this as a single choice.
 		// exceptions : if moving the explorer then include all directions 
 		// if moving the diver then the first tile may be sunk.
@@ -832,7 +852,7 @@ class ForbiddenIsland
 		foreach(p;players)
 		{
 			if(p.location.Status == LocationStatus.Sunk)
-			{
+			{				
 				if(p.role.IsPilot)
 				{
 					// pilot can always fly out to any tile
@@ -842,12 +862,28 @@ class ForbiddenIsland
 				{
 					// explorer and diver can use their usual movement rules
 					// everyone else orthogonal
-					foreach(tup;getAvailableTiles(p))
+					if(p.role.IsDiver)
 					{
-						// everyone can move and shore up adjacent if the tile is not sunk
-						// TODO: Diver's movement....						
-						if(tup[1].Status != LocationStatus.Sunk) currentActions ~= new Move(p.role,p.role,tup[1],true);
-					}	
+						//call divers movment, take first one (if any) and set its stranded flag to true
+						Action[] moves;
+						int[Location] seenTiles;					
+						DiversMovment(p.role,seenTiles,p.location, moves);
+						if(moves.length>0)
+						{
+							moves[0].AsMove.isStranded = true;
+							currentActions ~= moves[0];
+						}
+					}
+					else
+					{
+						foreach(tup;getAvailableTiles(p))
+						{
+							// everyone can move and shore up adjacent if the tile is not sunk
+							// TODO: Diver's movement....						
+							if(tup[1].Status != LocationStatus.Sunk) currentActions ~= new Move(p.role,p.role,tup[1],true);
+						}	
+					}
+
 				}
 				if(currentActions.length == 0)
 				{
@@ -856,6 +892,7 @@ class ForbiddenIsland
 				return currentActions;
 			}
 		}
+
 
 		// all sandbag / helicopter cards can be played at any time from any player 
 		// this includes when forced to discard, the only time this does not apply
@@ -878,8 +915,7 @@ class ForbiddenIsland
 			}
 		}				
 
-		Player p = GetByRole(role);
-
+		Player p = GetByRole(role);		
 		foreach(card;p.treasureHand.items)
 		{
 			 // if a player has a waters rise card, they cannot do anything else but play it
@@ -916,16 +952,30 @@ class ForbiddenIsland
 				currentActions ~= new Shore(p.role, p.location);
 			}
 
-			foreach(tup;getAvailableTiles(p))
+			if(p.role.IsDiver)
 			{
-				// everyone can move and shore up adjacent if the tile is not sunk
-				// TODO: Diver's movement....
-				if(tup[1].Status != LocationStatus.Sunk) currentActions ~= new Move(p.role,p.role,tup[1],false);
-				if(tup[1].Status == LocationStatus.Sinking) currentActions ~= new Shore(p.role,tup[1]);
+				foreach(tup;getAvailableTiles(p))
+				{
+					if(tup[1].Status == LocationStatus.Sinking) currentActions ~= new Shore(p.role,tup[1]);
+				}
+				Action[] moves;
+				int[Location] seenTiles;
+				seenTiles[p.location] = 1;
+				DiversMovment(p.role,seenTiles,p.location, moves);
+				currentActions ~= moves;
 			}
-
+			else
+			{
+				foreach(tup;getAvailableTiles(p))
+				{
+					// everyone can move and shore up adjacent if the tile is not sunk
+					// TODO: Diver's movement....
+					if(tup[1].Status != LocationStatus.Sunk) currentActions ~= new Move(p.role,p.role,tup[1],false);
+					if(tup[1].Status == LocationStatus.Sinking) currentActions ~= new Shore(p.role,tup[1]);
+				}
+			}
 			//navigator can also move everyone else 2 spaces using their normal moves eg not the pilot speical
-			//but can move the explorer in diagonals and the diver with this movement (todo)
+			//but can move the explorer in diagonals and the diver with this movement 
 			if(p.role.IsNavigator)
 			{
 				// rewrote this whole thing from functional to imperatively as its way easier and makes more sense!
@@ -1063,6 +1113,64 @@ unittest // role start locations are correct
 
 }
 
+unittest // divers movement 
+{
+	auto fi = new ForbiddenIsland();
+	auto div = new Diver();
+	auto nav =  new Navigator();
+	fi.initialize([div,nav],3,false);
+
+	foreach(tile;fi.islandTiles)
+	{
+		tile.Status = LocationStatus.Surface;
+	}
+
+	auto expected =
+		[FoolsLanding.stringof,
+		 Observatory.stringof,
+		 TempleOfTheMoon.stringof,
+		 TidalPalace.stringof];
+
+	assert(
+			fi.GetAvailableActions(div)
+			.muggiiii!(x=>x.AsMove)
+			.map!(x=>x.destination)
+			.array
+			.sort!((x,y) => x.__tag < y.__tag)
+			.array
+			.equal!((x,y)=>x.__tag == y)(expected)
+			);
+
+	fi.island[2][2].Status = LocationStatus.Sinking; 	// fools
+	fi.island[2][1].Status = LocationStatus.Sunk;			// silver gate
+	fi.island[2][0].Status = LocationStatus.Sinking; 	// gold gate
+	fi.currentActions.length = 0;
+
+	expected =
+		[CaveOfEmbers.stringof,
+		 CaveOfShadows.stringof,
+		 CoralPalace.stringof,
+		 FoolsLanding.stringof,
+		 GoldGate.stringof,
+		 LostLagoon.stringof,
+		 MistyMarsh.stringof,
+		 Observatory.stringof,		 
+		 TempleOfTheMoon.stringof,
+		 TidalPalace.stringof];
+
+	assert(
+			fi.GetAvailableActions(div)
+			.muggiiii!(x=>x.AsMove)
+			.map!(x=>x.destination)
+			.array
+			.sort!((x,y) => x.__tag < y.__tag)
+			.array
+			.equal!((x,y)=>x.__tag == y)(expected)
+			);
+
+}
+
+
 unittest // navigators movement 
 {
 	auto fi = new ForbiddenIsland();
@@ -1086,13 +1194,14 @@ unittest // navigators movement
 
 	assert(
 			fi.GetAvailableActions(nav)
-			.filter!(x=>x.IsMove)
-			.map!(x=>x.AsMove)
-			.filter!(x=>x.target.IsExplorer)
-			.map!(x=>x.destination)
+			.muggiiii!(x=>x.AsMove)
+			.filter_map!(x=>x.target.IsExplorer,x=>x.destination)
 			.array
-			.sort!((x,y)=>x.__tag < y.__tag)
+			.sort!((x,y) => x.__tag < y.__tag)
 			.array
-			.equal!((x,y)=>x.__tag == y)(expected));
+			.equal!((x,y)=>x.__tag == y)(expected)
+			);
 
+
+			
 }

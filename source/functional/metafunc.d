@@ -126,3 +126,101 @@ template meta_fold(Acc, alias Folder)
 		}
 	}
 }
+
+
+import std.functional : pipe, unaryFun;
+import std.algorithm : map, filter;
+template try_transform(alias mapper, alias pred) 
+	if (is(typeof(unaryFun!mapper)) && is(typeof(unaryFun!filter)))
+{
+
+	alias try_transform = pipe!(map!(mapper), filter!(pred));
+} 
+
+template filter_map(alias predicate, alias mapper ) 
+	if (is(typeof(unaryFun!predicate)) && is(typeof(unaryFun!mapper)))
+{
+	import std.range: isInputRange;
+	import std.traits: Unqual;
+    auto filter_map(Range)(Range range) if (isInputRange!(Unqual!Range))
+    {
+        return FilterMapResult!(unaryFun!predicate, unaryFun!mapper, Range)(range);
+    }
+}
+
+unittest
+{
+	import std.array;
+
+	import std.algorithm : filter, map;
+	string s = null;
+	string[] r = ["",null,""];
+	//alias test = pipe!(map!(a=>a), filter!(a=>false));
+	//auto cxx = test(r);
+
+	alias test = try_transform!("a", x=>x !is null);
+	//auto x = try_transform!(a => a, x=>false)(r);
+	auto z = test(r).array;
+
+	//z.filter_map
+	
+	//auto x = r.filter_map!(x=>x*x,x=>x<4);
+	import std.stdio;
+	writeln(z);
+	//assert(0,z);
+}
+//static if (is(typeof(fun) == delegate) || is(typeof(fun) == function))
+    //{    
+
+private struct FilterMapResult(alias pred, alias mapper, Range)
+{	
+	import std.range: isInputRange, isInfinite, isForwardRange;
+	import std.traits: Unqual;
+    
+    alias R = Unqual!Range;
+    R _input;
+    
+    this(R r)
+    {
+        _input = r;
+        // move to the first item that matches the predicate
+        while (!_input.empty && !pred(_input.front))
+        {
+            _input.popFront();
+        }
+    }
+
+    auto opSlice() { return this; }
+
+    static if (isInfinite!Range)
+    {
+        enum bool empty = false;
+    }
+    else
+    {
+        @property bool empty() { return _input.empty; }
+    }
+
+    void popFront()
+    {
+    	// transform the current item and move to the next 
+    	// that matches the predicate
+        do
+        {
+            _input.popFront();
+        } while (!_input.empty && !pred(_input.front));
+    }
+
+    @property auto ref front()
+    {
+        return mapper(_input.front);
+    }
+
+    static if (isForwardRange!R)
+    {
+        @property auto save()
+        {
+            return typeof(this)(_input.save);
+        }
+    }
+}
