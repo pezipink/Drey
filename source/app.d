@@ -8,10 +8,11 @@ import std.string;
 import std.array;
 import std.stdio;
 import std.typecons;
+import core.thread;
 import du;
 alias std.stdio.writeln wl;
 import fi;
-
+import maths.vector;
 const auto RGB_Yellow = SDL_Color(255, 255, 0, 0);
 const auto RGB_Red = SDL_Color(255, 0, 0, 0);
 const auto RGB_Green = SDL_Color(0, 255, 0, 0);
@@ -20,6 +21,102 @@ const auto RGB_White  = SDL_Color(255, 255, 255, 0);
 const auto RGB_Black  = SDL_Color(0, 0, 0, 0);
 
 T WRAPP(T)(T x, T max) { return x > max ? x-max : x; }
+
+class CardFlipFiber : Fiber
+{
+    SDL_Renderer* renderer;
+    SDL_Texture* tex;
+    SDL_Rect srcr, destr;
+    const ImageData imageData;
+    int currentStep = 0;
+    float x,y;
+    float xd, yd;
+    int duration = 60;
+    int width = 409/4;
+    int height = 585/4;
+    float shrinkFactor;
+    float wz;
+
+    void delegate() callback;   
+    
+    this(
+      SDL_Renderer* _renderer,
+      SDL_Texture* _tex,
+      const ImageData _imageData,
+      vec2 source,
+      vec2 dest,
+      void delegate() _callback)
+    {
+      import std.conv : to;
+      renderer = _renderer;
+      assert(renderer);
+      imageData = _imageData;
+      tex = _tex;
+      assert(tex);
+      callback = _callback;
+      
+      srcr.y = imageData.BackRow * imageData.itemHeight;
+      srcr.x = imageData.BackCol * imageData.itemWidth;
+      srcr.w = imageData.itemWidth;
+      srcr.h = imageData.itemHeight; 
+
+      destr.y = to!int(source.y*height);
+      destr.x = to!int(source.x*width);
+      destr.w = width;
+      destr.h = height; 
+      // work out the direction we are going thats longest
+      x = source.x * width;
+      y = source.y * height;
+      float xl, yl;
+      xl = dest.x < source.x ? source.x - dest.x : dest.x - source.x;
+      yl = dest.y < source.y ? source.y - dest.y : dest.y - source.y; 
+      xl *= width;
+      yl *= height;
+      //assume we want the animation to take 1 second and we are running 60fps
+      //work out the steps for the x and y axis to take that long
+      xd = xl / duration;
+      yd = yl / duration;
+      shrinkFactor = (width  ) / (duration / 2);
+      wz = width;
+      if(dest.x < source.x) xd = -xd;
+      if(dest.y < source.y) yd = -yd;
+      super( &run );
+    }
+
+private :
+    void run()
+    {
+      import std.conv : to;
+      void update() 
+      {
+        currentStep++;
+        SDL_RenderCopy(renderer, tex, &srcr, &destr);
+
+        x += xd;
+        y += yd;
+        destr.w = to!int(wz);
+        destr.x = to!int(x);
+        destr.y = to!int(y);
+        Fiber.yield();
+      }
+      while(currentStep < duration / 2)
+      {
+        
+        wz -= shrinkFactor;
+        update();
+      }
+      
+      srcr.y = imageData.FrontRow * imageData.itemHeight;
+      srcr.x = imageData.FrontCol * imageData.itemWidth;     
+        
+      while(currentStep < duration)
+      {
+        wz += shrinkFactor;
+       update();
+      }
+     callback();
+    }
+}
 
 mixin(DU!q{
   ActionMode =
@@ -110,6 +207,8 @@ private:
   // some actions are stateful, if one is progressing then this is it!
   Action currentAction;
 
+  //animation fibers
+  Fiber flipper;
 
 public:
   this( ) 
@@ -151,7 +250,7 @@ public:
     sunk  = Mix_LoadWAV(r"sounds\sunk.wav");
     alert   = Mix_LoadWAV(r"sounds\alert.wav");
     assert(swoosh);
-    _fi.initialize([new Navigator(),  new Diver()],3);
+    _fi.initialize([new Navigator(),  new Diver(), new Pilot(), new Engineer()],3);
     gameRunning = true;
   };
   
@@ -166,6 +265,44 @@ public:
     *bufp = colorSDL;
   }
 
+
+  auto getPlayerTreasureCardGrid(int player, int card)
+  {
+    import std.conv : to;
+    int x,y;
+    if(player == 0)
+    {
+      x = 0;
+      y = 0;
+    }
+    else if(player == 1)
+    {
+      x = 14;
+      y = 0;
+    }
+    else if(player == 2)
+    {
+      x = 0;
+      y = 6;
+    }
+    else
+    {
+      x = 14;
+      y = 6;
+    }
+
+    if(player == 0 || player == 2)
+    {
+      x += card;
+    }
+    else
+    {
+      x -= card;
+    }
+
+    return vec2(to!float(x),to!float(y));
+  }
+  
   void Render(){
     SDL_FillRect(_scr, null, 0x000000);
       
@@ -247,6 +384,7 @@ public:
     // draw player graphics
     foreach(i,p;_fi.players)
     {
+
       // first draw the player card indicator
       auto data = roleImageMap[p.role.__tag()];
       if(i == 0)
@@ -380,6 +518,11 @@ public:
     SDL_SetRenderDrawColor(_renderer,255,0,255,0);
     SDL_RenderDrawRect(_renderer,&dest);
 
+    if(flipper !is null && flipper.state != Fiber.State.TERM)
+    {
+      flipper.call();
+    }
+    
     SDL_RenderPresent(_renderer);
   }
 
@@ -692,6 +835,7 @@ public:
       waitingOnUser = true;
 
     }
+  
   };
   
   Uint8* _keyState;  
@@ -767,9 +911,14 @@ public:
     //InputHandler.Update();
   };
 
+
+  @property private bool waitingOnFibers()
+  {
+    return flipper !is null && flipper.state != Fiber.State.TERM;
+  }
   void MouseClick()
   {
-    if(waitingOnUser)
+    if(waitingOnUser && ! waitingOnFibers )
     {
       int x, y;
       int width = 409/4;
@@ -841,12 +990,29 @@ public:
             {
               Mix_PlayChannel(1,sunk,0); 
             }
+            _fi.ProcessAction(*action);
           }
           else if(action.IsDrawTreasure)
           {
-            Mix_PlayChannel(1,swoosh,0);             
+            Mix_PlayChannel(1,swoosh,0);
+            // work out where this card is headed
+            auto player = _fi.players[_fi.currentPlayer];
+            auto loc = getPlayerTreasureCardGrid(_fi.currentPlayer,player.treasureHand.items.length);
+            flipper = new CardFlipFiber(
+              _renderer, 
+              _fi_tex,
+              treasureImageMap[_fi.treasureDeck.active_deck.items[0].__tag],
+              vec2(treasure_deck_location[1],treasure_deck_location[0]), 
+              loc,
+              () => {_fi.ProcessAction(*action);waitingOnUser = false;}()
+                          
+            );             
           }
-          _fi.ProcessAction(*action);
+          else
+          {
+            _fi.ProcessAction(*action);
+          }
+          
           if(_fi.players.map!(x=>x.treasureHand.items).joiner.any!(x=>x.IsWatersRise))
           {
             Mix_PlayChannel(2,alert,0); 
