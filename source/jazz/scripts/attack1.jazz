@@ -1,0 +1,8 @@
+(basicAttack
+	(prelude 
+	  (let angle 0.0) 
+	  (let delta (rnd 10 200)))
+	(update
+	  (set angle (WRAPP (+ angle 0.5) 360.0))
+	  (set pos.y (+ 240 (* (cos angle) delta)))
+	  (set pos.x (WRAPP (+ pos.x 1) 640 ))))
