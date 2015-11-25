@@ -179,12 +179,12 @@ private:
   SDL_Window* _window;
   SDL_Renderer* _renderer;
   SDL_Surface* _scr;
-  SDL_Surface* _fi_surf;
-  SDL_Texture* _fi_tex;
+  SDL_Surface* _fi_surf, _fi_title_surf;
+  SDL_Texture* _fi_tex, _fi_title_tex;
   SDL_Texture* _scrTex;
   TTF_Font* _font;
 
-  Mix_Chunk* swoosh, sinking, sunk, alert;
+  Mix_Chunk* swoosh, sinking, sunk, alert, background, move, shoreup;
 
   // game state / flags etc 
   auto _fi = new ForbiddenIsland();
@@ -229,6 +229,7 @@ public:
     _renderer = SDL_CreateRenderer(_window,-1,0);
 
     _fi_surf = IMG_Load(relativePath(r"images\fi.jpg").toStringz);
+    _fi_title_surf = IMG_Load(relativePath(r"images\fi_title.jpg").toStringz);
     assert(_fi_surf);
 
     _scr = SDL_CreateRGBSurface(0, 1600, 900, 32,
@@ -243,15 +244,21 @@ public:
 
     _fi_tex = SDL_CreateTextureFromSurface(_renderer,_fi_surf);
     assert(_fi_tex);
+    _fi_title_tex = SDL_CreateTextureFromSurface(_renderer,_fi_title_surf);
 
     Mix_OpenAudio(22050, MIX_DEFAULT_FORMAT, 2, 4096);
     swoosh = Mix_LoadWAV(r"sounds\swoosh.wav");
     sinking  = Mix_LoadWAV(r"sounds\sinking.wav");
     sunk  = Mix_LoadWAV(r"sounds\sunk.wav");
     alert   = Mix_LoadWAV(r"sounds\alert.wav");
+    background   = Mix_LoadWAV(r"sounds\background.wav");
+    move   = Mix_LoadWAV(r"sounds\move.wav");
+    shoreup   = Mix_LoadWAV(r"sounds\shoreup.wav");
     assert(swoosh);
     _fi.initialize([new Navigator(),  new Diver(), new Pilot(), new Engineer()],3);
     gameRunning = true;
+    Mix_PlayChannel(-1,background,-1);
+    SDL_FreeSurface(_fi_surf);
   };
   
   @system
@@ -283,12 +290,12 @@ public:
     else if(player == 2)
     {
       x = 0;
-      y = 6;
+      y = 5;
     }
     else
     {
       x = 14;
-      y = 6;
+      y = 5;
     }
 
     if(player == 0 || player == 2)
@@ -309,6 +316,9 @@ public:
     SDL_UpdateTexture(_scrTex, null, _scr.pixels, _scr.pitch);
     SDL_RenderClear(_renderer);    
     SDL_RenderCopy(_renderer, _scrTex, null, null);
+
+    // draw the background
+    // SDL_RenderCopy(_renderer, )
 
     // draw the island tiles
     SDL_Rect src;
@@ -984,17 +994,17 @@ public:
           {
             if(flood.destination.Status == LocationStatus.Surface)
             {
-              Mix_PlayChannel(1,sinking,0);
+              Mix_PlayChannel(-1,sinking,0);
             }
             else
             {
-              Mix_PlayChannel(1,sunk,0); 
+              Mix_PlayChannel(-1,sunk,0); 
             }
             _fi.ProcessAction(*action);
           }
           else if(action.IsDrawTreasure)
           {
-            Mix_PlayChannel(1,swoosh,0);
+            Mix_PlayChannel(-1,swoosh,0);
             // work out where this card is headed
             auto player = _fi.players[_fi.currentPlayer];
             auto loc = getPlayerTreasureCardGrid(_fi.currentPlayer,player.treasureHand.items.length);
@@ -1004,19 +1014,30 @@ public:
               treasureImageMap[_fi.treasureDeck.active_deck.items[0].__tag],
               vec2(treasure_deck_location[1],treasure_deck_location[0]), 
               loc,
-              () => {_fi.ProcessAction(*action);waitingOnUser = false;}()
+              () => 
+              {
+                _fi.ProcessAction(*action);
+                waitingOnUser = false;
+                if(_fi.players.map!(x=>x.treasureHand.items).joiner.any!(x=>x.IsWatersRise))
+                {
+                  Mix_PlayChannel(-1,alert,0); 
+                }}()
                           
             );             
           }
           else
           {
+            if(action.IsMove)
+            {
+              Mix_PlayChannel(-1,move,0);
+            }
+            else if(action.IsShore)
+            {
+             Mix_PlayChannel(-1,shoreup,0); 
+            }
             _fi.ProcessAction(*action);
           }
-          
-          if(_fi.players.map!(x=>x.treasureHand.items).joiner.any!(x=>x.IsWatersRise))
-          {
-            Mix_PlayChannel(2,alert,0); 
-          }
+                  
         } 
         waitingOnUser = false;
       }
