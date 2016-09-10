@@ -91,33 +91,24 @@ struct Scanner
         current = Token(Tok.EOF,"");
         return;
       }
-    auto c = s.front;
-    if(c.isWhite)
+
+    if(ch.isWhite)
       {
         // consume all subsequent whitespace
-        while(c.isWhite && !s.empty)
+        while(!s.empty && ch.isWhite)
           {
             s.popFront();
-            if(!s.empty)
-              {
-                c = s.front;
-              }
           }
         current = Token(Tok.WS,"");
       }
-    else if(c.isAlphaNum || c == '_')
+    else if(ch.isAlphaNum || ch == '_')
       {
         // extract identifier
         string ident;
-        while((c.isAlphaNum || c == '_') && !s.empty)
+        while(!s.empty && (ch.isAlphaNum || ch == '_'))
           {
-            ident ~= c;
+            ident ~= ch;
             s.popFront();
-            if(!s.empty)
-              {
-                c = s.front;
-              }
-            
           }
         // return keyword or identifier
         switch(ident.toUpper)
@@ -136,50 +127,50 @@ struct Scanner
       }
     else
       {
-        switch(c)
+        switch(ch)
           {
           case '|' :
-            current = Token(Tok.PIPE,to!string(c));
+            current = Token(Tok.PIPE,to!string(ch));
             s.popFront();
             break;
           case ',' :
-            current = Token(Tok.COMMA,to!string(c));
+            current = Token(Tok.COMMA,to!string(ch));
             s.popFront();
             break;
           case '.' :
-            current = Token(Tok.DOT,to!string(c));
+            current = Token(Tok.DOT,to!string(ch));
             s.popFront();
             break;
           case '@' :
-            current = Token(Tok.AT,to!string(c));
+            current = Token(Tok.AT,to!string(ch));
             s.popFront();
             break;
           case '=' :
-            current = Token(Tok.EQUALS,to!string(c));
+            current = Token(Tok.EQUALS,to!string(ch));
             s.popFront();
             break;
           case '(': 
           case '[':
           case '{':
-            current = Token(Tok.LBRACKET,to!string(c));
+            current = Token(Tok.LBRACKET,to!string(ch));
             s.popFront();
             break;
           case ')':
           case ']':
           case '}':
-            current = Token(Tok.RBRACKET,to!string(c));
+            current = Token(Tok.RBRACKET,to!string(ch));
             s.popFront();
             break;
           case '*' :
-            current = Token(Tok.STAR,to!string(c));
+            current = Token(Tok.STAR,to!string(ch));
             s.popFront();
             break;
           case ':':
-            current = Token(Tok.COLON,to!string(c));
+            current = Token(Tok.COLON,to!string(ch));
             s.popFront();
             break;
           case '#' :
-            current = Token(Tok.HASH,to!string(c));
+            current = Token(Tok.HASH,to!string(ch));
             s.popFront();
             break;
           case '"' :
@@ -197,21 +188,15 @@ struct Scanner
             break;
           case '/' :
             s.popFront();
-            c = s.front;
-            if(c == '/')
+            if(ch == '/')
               {
                 // single line comments, consume until \n
                 string comment;
                 s.popFront();
-                c = s.front;
-                while(c != '\n' && !s.empty)
+                while(!s.empty && ch != '\n')
                   {
-                    comment ~= c;
+                    comment ~= ch;
                     s.popFront();
-                    if(!s.empty)
-                      {
-                        c = s.front;
-                      }
                   }
 
                 if(!s.empty)
@@ -220,9 +205,9 @@ struct Scanner
                   }
                 current = Token(Tok.COMMENT,comment);
               }
-            else if( c == '*')
+            else if( ch == '*')
               {
-                auto cp = c;
+                auto cp = ch;
                 string comment;
                 while(true)
                   {
@@ -233,15 +218,14 @@ struct Scanner
                         current = Token(Tok.ERROR,comment);
                         break;
                       }
-                    c = s.front;
-                    if(cp == '*' && c == '/')
+                    if(cp == '*' && ch == '/')
                       {
                         current = Token(Tok.COMMENT, comment);
                         s.popFront();
                         break;
                       }
                     comment ~= cp;
-                    cp = c;
+                    cp = ch;
                 
                   }
               }
