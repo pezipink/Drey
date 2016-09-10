@@ -2,27 +2,10 @@ module deck;
 import std.traits : isAbstractClass, isFinalClass;
 import std.typetuple;
 
-struct Quantity { int amount; }
-
-alias helper(alias T) = T;
-
-// template Parent(Class) if (is(Class == class))
-// {
-//     static if (is(Class Parent == super))
-//         alias Parent = TypeTuple!(Parent);
-//     else 
-//     	alias Parent = TypeTuple!();
-// }
-
-template GetQuantity(T) 
+public enum DrawType
 {
-	enum GetQuantity()
-	{
-		foreach(attr; __traits(getAttributes, T))
-			static if(is(typeof(attr) == Quantity))
-				return attr.amount;
-		assert(0);
-	}
+	Top,
+	Bottom
 }
 
 struct Deck(T)
@@ -31,7 +14,7 @@ struct Deck(T)
 	import std.random : randomShuffle;
 	import std.algorithm : filter;
 	import std.traits : isIterable;
-
+	
 	T[] items;
 
 	@property int length() { return items.length; }
@@ -80,13 +63,13 @@ struct Deck(T)
 		items = items[n..$];
 		return ret;
 	}
-
-	auto drawSingle(T toFind) 
+	auto drawSingle(bool delegate(ref T) toFind) 
 	{
 		int index = -1;
+		
 		for(index=0; index<items.length; index++)
 		{
-			if(items[index] == toFind)
+			if(toFind(items[index]))
 			{
 				break;
 			}
@@ -100,7 +83,6 @@ struct Deck(T)
 		if(index == 0)
 		{
 			items = items[1..$];
-			
 		}
 		else if(index == items.length -1)
 		{
@@ -112,12 +94,28 @@ struct Deck(T)
 		}
 		return item;
 	}
-	auto drawSingle() 
+	
+	auto drawSingle(T toFind) 
+	{
+		return drawSingle((ref x)=>x==toFind);	
+	}
+
+	auto drawSingle(DrawType type = DrawType.Top) 
 	in { assert(1 <= items.length); } body
 	{
-		auto ret = items[0];
-		items = items[1..$];
-		return ret;
+		if(type == DrawType.Top)
+		{
+			auto ret = items[0];
+			items = items[1..$];
+			return ret;
+		}
+		else if(type == DrawType.Bottom)
+		{
+			auto ret = items[$-1];
+			items = items[0..$-2];
+			return ret;	
+		}
+		assert(0);
 	}
 
 	alias items this;
@@ -197,7 +195,12 @@ struct DeckPair(T)
 		discard_deck.items = [];
 		return this;
 	}
-
+	auto merge_back()
+	{
+		active_deck.items = active_deck.items ~= discard_deck.items;
+		discard_deck.items = [];
+		return this;
+	}
 	auto discard(T item)
 	{
 		discard_deck.placeTop(item);
@@ -205,4 +208,3 @@ struct DeckPair(T)
 
 
 }
-

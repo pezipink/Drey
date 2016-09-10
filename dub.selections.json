@@ -1,8 +1,8 @@
 {
-	"fileVersion": 1,
 	"versions": {
-		"derelict-util": "2.0.4",
-		"derelict-sdl2": "1.9.7",
-		"derelict-gl3": "1.0.17"
-	}
+		"derelict-gl3": "1.0.19",
+		"derelict-sdl2": "2.0.0",
+		"derelict-util": "2.0.6"
+	},
+	"fileVersion": 1
 }
