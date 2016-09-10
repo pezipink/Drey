@@ -33,6 +33,8 @@ struct Token
   }
 }
 
+// lexer is implemented as a D ForwardOnly range
+// (empty, front, popFront)
 struct Scanner
 {
   import std.ascii : isWhite, isAlpha, isAlphaNum;
@@ -55,6 +57,7 @@ struct Scanner
   }
 
   @property bool empty() const { return finished; }
+
   @property ref Token front()
   {
     if(finished)
@@ -91,6 +94,7 @@ struct Scanner
     auto c = s.front;
     if(c.isWhite)
       {
+        // consume all subsequent whitespace
         while(c.isWhite && !s.empty)
           {
             s.popFront();
@@ -103,6 +107,7 @@ struct Scanner
       }
     else if(c.isAlphaNum || c == '_')
       {
+        // extract identifier
         string ident;
         while((c.isAlphaNum || c == '_') && !s.empty)
           {
@@ -114,6 +119,7 @@ struct Scanner
               }
             
           }
+        // return keyword or identifier
         switch(ident.toUpper)
           {
           case "OF" :
@@ -177,6 +183,7 @@ struct Scanner
             s.popFront();
             break;
           case '"' :
+            // consume until end of string
             string str = "\"";
             s.popFront();
             while(!s.empty && ch != '"')
@@ -193,6 +200,7 @@ struct Scanner
             c = s.front;
             if(c == '/')
               {
+                // single line comments, consume until \n
                 string comment;
                 s.popFront();
                 c = s.front;
@@ -218,6 +226,7 @@ struct Scanner
                 string comment;
                 while(true)
                   {
+                    // multi line comments, consume until */
                     s.popFront();
                     if(s.empty())
                       {
@@ -249,6 +258,7 @@ struct Scanner
       }
     if(ignoreCruft && ( current.token == Tok.WS || current.token == Tok.COMMENT || current.token == Tok.EOF))
       {
+        // if ignoreCruft is true the lexer skips yielding comments and whitespace in the range 
         popFront();
       }
   } 
