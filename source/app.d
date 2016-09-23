@@ -1,3 +1,4 @@
+
 import derelict.sdl2.sdl;
 import derelict.sdl2.image;
 import derelict.sdl2.ttf;
@@ -6,6 +7,10 @@ import control;
 import std.stdio;
 import std.typecons;
 import du;
+import pandemic;
+import TextureManager;
+import DeckControl;
+import types;
 alias wl = writeln;
 
 
@@ -20,14 +25,88 @@ public:
   int width = 1600;
   int height = 900;
   SDL_Renderer* renderer;
+  SDLTextureManager textures;
+  Pandemic pandemic;
   bool IsKeyDown(SDL_Scancode code){ return keyState[code] == 1; }
-    
+
+ 
 }
+
+
+mixin(DU!q{
+
+Union GameStates =
+  | MainMenu
+  | InPlay of state : Pandemic
+
+
+});
+
+public class MainMenuControl : Control
+{
+  SDL_Texture* title;
+  auto titleWidth = 976;
+  auto titleHeight = 1340;
+  enum ButtonId
+    {
+      SinglePlayer,
+      Exit
+    }
+
+  this(CoreControl parent,SDL_Rect bounds)
+  {
+    import std.path;
+    import std.string;
+    this.bounds = bounds;
+    super(parent);
+    auto surf = IMG_Load(relativePath(r"images\title.jpg").toStringz);
+    title = SDL_CreateTextureFromSurface(parent.state.renderer,surf);
+    SDL_FreeSurface(surf);
+
+  }
+
+  ubyte g = 255;
+  override bool HandleInput(InputMessage msg, SDL_Rect relativeBounds, bool handled){ return false; }
+  override void Update(){ }
+  override void Render(SDL_Renderer* renderer, SDL_Rect relativeBounds)
+  {
+    SDL_SetRenderDrawColor(renderer,255,g,0,0);
+    SDL_RenderFillRect(renderer,&relativeBounds);
+  }
+  override bool OnMouseEnter(bool handled){g = 50; return false; }
+  override bool OnMouseLeave(bool handled){g = 255; return false; }
+  
+}
+
 
 public class Window : Control
 {
 
+  this(Control parent,SDL_Rect bounds)
+  {
+    this.bounds = bounds;
+    super(parent);
+
+  }
+
+  public void Test()
+  {
+    AddControl(new Window(this,SDL_Rect(30,30,100,100)));
+  }
+
+  ubyte g = 255;
+  override bool HandleInput(InputMessage msg, SDL_Rect relativeBounds, bool handlded){ return false; }
+  override void Update(){ }
+  override void Render(SDL_Renderer* renderer, SDL_Rect relativeBounds)
+  {
+    SDL_SetRenderDrawColor(renderer,255,g,0,0);
+    SDL_RenderFillRect(renderer,&relativeBounds);
+  }
+  override bool OnMouseEnter(bool handled){g = 50; return false; }
+  override bool OnMouseLeave(bool handled){g = 255; return false; }
+  
 }
+
 
 public class MapControl : Control
 {
@@ -43,21 +122,22 @@ private:
 public:
 
   
-  this(GameState state)
+  this(Control parent, GameState state)
   {
     import std.path;
     import std.string;
-		    
     _state = state;
+    super(parent);
+    bounds.x = 0;
+    bounds.y = 0;
+    bounds.w = _state.width;
+    bounds.h= _state.height;
     auto surf = IMG_Load(relativePath(r"images\pandemicMap.jpg").toStringz);
     _map = SDL_CreateTextureFromSurface(_state.renderer,surf);
     SDL_FreeSurface(surf);
-
-  }
-  
-  override bool HandleInput(bool input)
-  {
-    return false;
+    auto w = new Window(this,SDL_Rect(30,30,500,500));
+    AddControl(w);
+    w.Test();
   }
 
   override void Update()
@@ -105,7 +185,7 @@ public:
     return;
   }
 
-  override void Render(SDL_Renderer* renderer, int xOffset, int yOffset)
+  override void Render(SDL_Renderer* renderer, SDL_Rect relativeBounds)
   {
     SDL_SetRenderDrawColor(renderer,255,0,0,0);
     SDL_Rect src;
@@ -164,25 +244,22 @@ class CoreControl : Control
 public:
   this(GameState state)
   {
-    _state = state;
+    super(null);
+    this.state = state;
   }
-  void AddControl(Control child)
-  {
-    _children.insertBack(child);
-  }
+
+
+  GameState state;
+
 protected:
-  GameState _state;
-  override bool HandleInput(bool input)
+  
+  override bool HandleInput(InputMessage msg, SDL_Rect relativeBounds, bool handled)
   {
     return false;
   }
 
-  override void Update()
-  {
-      return;
-  }
 
-  override void Render(SDL_Renderer* renderer, int xOffset, int yOffset)
+  override void Render(SDL_Renderer* renderer, SDL_Rect relativeBounds)
   {
     return;
   }
@@ -192,8 +269,6 @@ protected:
 
 class Game
 {
-
-
   // SDL stuff
   SDL_Window* _window;
   SDL_Surface* _scr;
@@ -202,29 +277,71 @@ class Game
   void Init()
   {
     _state = new GameState();
-    _window = SDL_CreateWindow("Pandemic", SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED,_state.width,_state.height,SDL_WINDOW_SHOWN);
-    // SDL_SetWindowFullscreen(_window,SDL_WINDOW_FULLSCREEN);
-    _state.renderer = SDL_CreateRenderer(_window,-1,0);
+    _window = SDL_CreateWindow
+      ("Pandemic",
+       SDL_WINDOWPOS_CENTERED,
+       SDL_WINDOWPOS_CENTERED,
+       _state.width,
+       _state.height,
+       SDL_WINDOW_SHOWN);
+    //SDL_SetWindowFullscreen(_window,SDL_WINDOW_FULLSCREEN);
+    _state.renderer = SDL_CreateRenderer(_window,-1,SDL_RENDERER_PRESENTVSYNC | SDL_RENDERER_ACCELERATED);
+    _state.textures = SDLTextureManager(_state.renderer);
+    _state.pandemic = new Pandemic([Role.Tags.Medic,Role.Tags.Scientist],5);
+    InitializeTextures();
     _core = new CoreControl(_state);
-    _core.AddControl(new MapControl(_state));
-   _state.gameRunning = true;
+    CreateControls();
+    _state.gameRunning = true;
   }
+
+  void InitializeTextures()
+  {
+    _state.textures.EnsureLoaded("playercards","images\\playercards.png");
+  }
+
+  void CreateControls()
+  {
+    _core.AddControl(new MapControl(_core,_state));
+    auto c =
+      new DeckControls!PlayerCard
+      (_core,
+       _state.pandemic.playerCards.active_deck,
+       SDL_Rect(0,0,100,140),
+       (ref card,face, renderer, dest) =>
+         {
+           auto tex = _state.textures.GetTexture("playercards");
+           SDL_Rect r;
+           r.w = 200;
+           r.h = 290;
+
+           if(face == DeckControl.Face.Front)
+             {
+             }
+           else
+             {
+               r.x = 200;
+               r.y = 290;
+             }
+           SDL_RenderCopy(renderer, tex, &r, &dest);
+
+         }());
+    _core.AddControl(c);
+  }
+    
 
   void Render()
   {
     SDL_SetRenderDrawColor(_state.renderer,0,0,0,0);
     SDL_RenderFillRect(_state.renderer, null);
-    _core.CoreRender(_state.renderer,0,0);
+    _core.CoreRender(_state.renderer,_core.bounds);
     SDL_RenderPresent(_state.renderer);
   }
-
 
   void Update()
   {
     _core.CoreUpdate();
   }
-  
-  
+    
   void HandleEvents()
   {
     _state.keyState = SDL_GetKeyboardState(null);
@@ -239,7 +356,6 @@ class Game
 	switch(event.type)
 	  {
 	  case SDL_KEYDOWN:
-	    //writeln(event.key.keysym.scancode);
 	    switch(event.key.keysym.sym)
 	      {
 	      case 'm':
@@ -251,15 +367,24 @@ class Game
 	      }
 	    break;
 	  case SDL_MOUSEMOTION:
+            
 	    _state.mouseX = event.motion.x;
 	    _state.mouseY = event.motion.y;
+            _core.CoreHandleInput
+              (new MouseMove(_state.mouseX,_state.mouseY),_core.bounds,false);
 	    break;
 	  case SDL_MOUSEBUTTONUP:
 	    if(event.button.button == SDL_BUTTON_LEFT)
 	      {
-		_state.mouseX = event.button.x;
-		_state.mouseY = event.button.y;
+                _core.CoreHandleInput
+                  (new MouseButton(MouseButtonType.Left, _state.mouseX, _state.mouseY),_core.bounds,false);
 	      }
+            else if(event.button.button == SDL_BUTTON_RIGHT)
+	      {
+                _core.CoreHandleInput
+                  (new MouseButton(MouseButtonType.Right, _state.mouseX, _state.mouseY),_core.bounds,false);
+	      }
+
 	    break;
 	  case SDL_QUIT:
 	    _state.gameRunning=false;
@@ -289,7 +414,8 @@ void main()
   DerelictSDL2ttf.load();
   DerelictSDL2Mixer.load();
 
-  auto game = new Game();  
+  auto game = new Game();
+  
   uint frameStart, frameTime;
   game.Init();
   //  wl("init ", Game.delay_time);
@@ -307,7 +433,7 @@ void main()
     }
     else 
     {
-      // writeln("ouch ", frameTime - Game.delay_time, " ", frameTime); 
+       writeln("ouch ", frameTime - Game._state.delay_time, " ", frameTime); 
     }
     
   }

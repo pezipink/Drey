@@ -34,7 +34,6 @@ struct UnionData
 }
 
 
-
 struct Parser
 {
   import std.stdio:writeln;

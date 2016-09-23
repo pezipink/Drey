@@ -55,6 +55,7 @@ Tuple!(Disease,CityName[]) GetCityData(CityName name)
       case Manila : return tuple(Disease.Red,[Atlanta]);
       case MexicoCity : return tuple(Disease.Yellow,[LosAngeles,Chicago,Miami,Bogotá,Lima]);
       case Miami : return tuple(Disease.Red,[Atlanta]);
+
       case Milan : return tuple(Disease.Blue,[Atlanta]);
       case Montréal : return tuple(Disease.Blue,[NewYork,Washington,Chicago]);
       case Moscow : return tuple(Disease.Red,[Atlanta]);
@@ -592,7 +593,8 @@ final class Pandemic
             // remove top 5 and create new ones in the same order
             // todo: we should probably check the cards are the same here
             // and just re-arrange them
-            infectionCards.draw(5);
+   
+        infectionCards.draw(5);
             foreach(c;y.newCards)
               infectionCards.active_deck.placeTop(new CityInfectionCard(c));
           }

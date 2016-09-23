@@ -120,37 +120,33 @@ Union PlayerAction =
 
 struct City
 {
-	CityName name;
-	CityName[] connectedCities;
-	Disease disease;
-	int[Disease] infection;
-	bool hasResearchStation;
+  CityName name;
+  CityName[] connectedCities;
+  Disease disease;
+  int[Disease] infection;
+  bool hasResearchStation;
 }
 
 struct Player
 {
-	Role role;
-	CityName location;
-	Deck!PlayerCard cards;
-	int actionsRemaining = 4;
-	int playerCardsToDraw = 2;
-	int infectionCardsToDraw = 2;
+  Role role;
+  CityName location;
+  Deck!PlayerCard cards;
+  int actionsRemaining = 4;
+  int playerCardsToDraw = 2;
+  int infectionCardsToDraw = 2;
 }
 
 enum DiseaseState
-{
-	Active,
-	Cured,
-	Eradicated
-}
+  {
+    Active,
+    Cured,
+    Eradicated
+  }
 
 enum GameState
-{
-	Playing,
-	Won,
-	Lost
-}
-
-
-
-
+  {
+    Playing,
+    Won,
+    Lost
+  }
