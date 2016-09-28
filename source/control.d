@@ -1,4 +1,3 @@
-
 import derelict.sdl2.sdl;
 import derelict.sdl2.image;
 import std.stdio;
@@ -49,6 +48,7 @@ protected:
   bool OnMouseEnter(bool handled) { return handled; }
   bool OnMouseLeave(bool handled) { return handled; }
   bool OnMouseClick(bool handled, MouseButtonType button,int x, int y) { return handled; }
+  // void OnRecieveMessage(T message) { return; }
   
 public:
   // the order of this list is the z-order

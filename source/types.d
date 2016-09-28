@@ -1,3 +1,4 @@
+
 import du;
 import deck;
 enum CityName
@@ -98,7 +99,7 @@ Union EpidemicState of card : EpidemicCard = // we don't really need the card ye
 | EpidemicIncrease  // infection rate ++ 
 | EpidemicInfect	// bottom card gets 3 disease 
 | EpidemicIntensify // shuffle infection discard and place ontop of infection deck
-
+      
 Union PlayerAction =
 // Movement requires an explict role since the dispatcher can move other players
 | Drive of role : Role.Tags * target : CityName 

@@ -184,6 +184,7 @@ public:
 
 protected:
   
+
   override bool HandleInput(InputMessage msg, SDL_Rect relativeBounds, bool handled)
   {
     return false;
@@ -221,6 +222,6 @@ unittest
 {
   SDL_Rect r;
   auto d = Deck!int();
-  auto c = new DeckControls!int(null,d,r,(ref x,y,z) => {}()); 
+  // auto c = new DeckControls!int(null,d,r,(ref x,y,z) => {}()); 
 
 }

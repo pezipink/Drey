@@ -1,4 +1,5 @@
 
+
 import derelict.sdl2.sdl;
 import derelict.sdl2.image;
 import derelict.sdl2.ttf;
@@ -25,7 +26,6 @@ public:
   int width = 1600;
   int height = 900;
   SDL_Renderer* renderer;
-  SDLTextureManager textures;
   Pandemic pandemic;
   bool IsKeyDown(SDL_Scancode code){ return keyState[code] == 1; }
 
@@ -286,7 +286,8 @@ class Game
        SDL_WINDOW_SHOWN);
     //SDL_SetWindowFullscreen(_window,SDL_WINDOW_FULLSCREEN);
     _state.renderer = SDL_CreateRenderer(_window,-1,SDL_RENDERER_PRESENTVSYNC | SDL_RENDERER_ACCELERATED);
-    _state.textures = SDLTextureManager(_state.renderer);
+    //_state.textures = SDLTextureManager(_state.renderer);
+    TextureManager.SetRenderer(_state.renderer);
     _state.pandemic = new Pandemic([Role.Tags.Medic,Role.Tags.Scientist],5);
     InitializeTextures();
     _core = new CoreControl(_state);
@@ -296,7 +297,7 @@ class Game
 
   void InitializeTextures()
   {
-    _state.textures.EnsureLoaded("playercards","images\\playercards.png");
+    TextureManager.EnsureLoaded("playercards","images\\playercards.png");
   }
 
   void CreateControls()
@@ -309,7 +310,8 @@ class Game
        SDL_Rect(0,0,100,140),
        (ref card,face, renderer, dest) =>
          {
-           auto tex = _state.textures.GetTexture("playercards");
+           auto tex = TextureManager.GetTexture("playercards");
+           assert(tex !is null);
            SDL_Rect r;
            r.w = 200;
            r.h = 290;
@@ -433,7 +435,7 @@ void main()
     }
     else 
     {
-       writeln("ouch ", frameTime - Game._state.delay_time, " ", frameTime); 
+       // writeln("ouch ", frameTime - Game._state.delay_time, " ", frameTime); 
     }
     
   }

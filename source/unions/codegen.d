@@ -1,3 +1,4 @@
+
 module du;
 import parse;
 
@@ -7,7 +8,7 @@ string Generate(UnionData[] unions)
   import std.algorithm;
   import std.range;
   string baseClassTemplate = q{
-    class %s
+    abstract class %s
     {
       public enum Tags
       {
@@ -43,7 +44,8 @@ string Generate(UnionData[] unions)
                                 }");
                                 
         }  
-                
+
+      %s
     }
         
   };
@@ -51,7 +53,7 @@ string Generate(UnionData[] unions)
 
   string classTemplate = q{
     %s
-    public class %s : %s
+    final class %s : %s
     {
       %s
       this(%s)
@@ -92,9 +94,13 @@ string Generate(UnionData[] unions)
       baseConstructor ~= "\n\t\t\tthis._tag = Tags." ~ data.name ~ ";";         
         
       string tags = "\t" ~ data.name ~ ",\n" ~  data.caseData.map!(x=>"\t\t"~x.name).join(",\n");
-        
+
+      string derivedTypes =
+        format("import std.meta : AliasSeq; alias __derivedTypes = AliasSeq!(%s);",
+               data.caseData.map!(x=>x.name).join(","));
+
       auto baseClassDef = 
-        baseClassTemplate.format(data.name,tags,baseFields,baseConstrcutorArgs,baseConstructor);
+        baseClassTemplate.format(data.name,tags,baseFields,baseConstrcutorArgs,baseConstructor,derivedTypes);
         
       ret ~= baseClassDef;
       ret ~= "\n";
@@ -158,8 +164,8 @@ string Generate(UnionData[] unions)
 }
 
 
-template DU(string S)
-{
-  enum DU = Parser(S).ParseUnions.Generate;
-}
+  template DU(string S)
+  {
+    enum DU = Parser(S).ParseUnions.Generate;
+  }
 

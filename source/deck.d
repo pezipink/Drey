@@ -1,3 +1,4 @@
+
 module deck;
 import std.traits : isAbstractClass, isFinalClass;
 import std.typetuple;

@@ -1,19 +1,18 @@
+
 import derelict.sdl2.sdl;
 import derelict.sdl2.image;
 import std.path;
 import std.string;
 
-struct SDLTextureManager
-{
 private:
   SDL_Texture*[string] textures;
 
-  SDL_Renderer* renderer;
+  SDL_Renderer* _renderer;
   
 public:
-  this(SDL_Renderer* renderer)
+  void SetRenderer(SDL_Renderer* renderer)
   {
-    this.renderer = renderer;
+    _renderer = renderer;
   }
   
   void EnsureLoaded(string key, string imagePath)
@@ -21,7 +20,7 @@ public:
      if(key !in textures)
       {
         auto surf = IMG_Load(relativePath(imagePath).toStringz);
-        textures[key] = SDL_CreateTextureFromSurface(renderer,surf);
+        textures[key] = SDL_CreateTextureFromSurface(_renderer,surf);
         SDL_FreeSurface(surf);
       }
   }
@@ -31,4 +30,4 @@ public:
     assert(key in textures);
     return textures[key];
   }
-}
+
