@@ -8,7 +8,7 @@ string Generate(UnionData[] unions)
   import std.algorithm;
   import std.range;
   string baseClassTemplate = q{
-    abstract class %s
+    public abstract class %s
     {
       public enum Tags
       {
@@ -164,8 +164,15 @@ string Generate(UnionData[] unions)
 }
 
 
-  template DU(string S)
-  {
-    enum DU = Parser(S).ParseUnions.Generate;
-  }
+template DU(string S)
+{
+  enum DU = Parser(S).ParseUnions.Generate;
+}
 
+template IsUnion(UnionType)
+{
+  const IsUnion = __traits(compiles, {
+      UnionType.Tags t;
+      alias a = UnionType.__derivedTypes;
+    });
+}

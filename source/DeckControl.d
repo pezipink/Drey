@@ -6,6 +6,7 @@ import std.range;
 import du;
 import control;
 import deck;
+
 enum LayoutStyle
   {
     Stack,
@@ -19,71 +20,106 @@ enum Face
     Back
   }
 
-class LayoutFiber : Fiber
+class LayoutFiber(TState) : Fiber
 {
   LayoutStyle style;
-  Control c;
+  Control!TState c;
   int index;
-  this(Control c, int index)
+  this(Control!TState c, int index, LayoutStyle style)
   {
-    //this.style = style;
+    this.style = style;
     this.index = index;
     this.c = c;
     super(&Run);
   }
   public void Run()
   {
-    //    foreach(ref c;p._children)
-    {
-      c.bounds = c.parent.bounds;
-    }
+    
+    c.bounds = c.parent.bounds;
+    
     int i = 0;
-    //foreach(c;p._children)
-    {
-      //  p.PromoteZOrder(c);
-      while(c.bounds.x < index * 20)
-        {
-          c.bounds.x +=index;
-          Fiber.yield();
-          Fiber.yield();
-        }
-      //i++;
-      //        Fiber.yield();
-    }
+    if(style == LayoutStyle.OverlappingHorizontal)
+      {
+        while(c.bounds.x < index * 20)
+          {
+            c.bounds.x +=index;
+            Fiber.yield();
+            Fiber.yield();
+          }
+      }
+    else
+      {
+        while(c.bounds.y < index * 20)
+          {
+            c.bounds.y +=index;
+            Fiber.yield();
+            Fiber.yield();
+          }
+
+      }
   }
+  
 }
 
-class DeckControls(T) : Control
+class DeckControls(TState, T) : Control!TState
 {
+  import Messages;
 private:
   Deck!T deck;
   LayoutStyle style;
   Face[T] faces;
-  void delegate(ref T,Face face, SDL_Renderer* renderer, SDL_Rect dest ) draw;
+  void delegate(ref T,Face face,TState state, SDL_Renderer* renderer, SDL_Rect dest ) draw;
   Fiber[] f;
-  class Card : Control
+  class Card : Control!TState
   {
-    this(Control parent, T card)
+    this(Control!TState parent, T card)
     {
       super(parent);
       this.card = card;
     }
     T card;
 
-    override bool OnMouseEnter(bool handled)
+    int prevIndex = 0;
+    override bool OnMouseEnter(TState state, bool handled)
     {
+      import std.conv;
+      prevIndex = 0;
+      foreach(c; parent._children)
+        {
+          if(c == this)
+            {
+              break;
+            }
+          prevIndex++;
+        }
       parent.PromoteZOrder(this);
+      if(auto x = card.AsCityCard)
+        {
+          state.router.PostMessage(new Status(x.city.to!string));
+        }      
+      else if(auto x = card.AsEpidemicCard)
+        {
+          state.router.PostMessage(new Status("Epidemic!"));
+        }
       return true;
 
     }
     
-    override bool OnMouseClick(bool handled, MouseButtonType button, int x, int y)
+    override bool OnMouseClick(TState state, bool handled, MouseButtonType button, int x, int y)
     {
       if(button == MouseButtonType.Left)
         {
-          parent.DemoteZOrder(this);
-          parent.mouseControl = null;
-          RefreshMouseControl(x,y);
+          if(style == LayoutStyle.OverlappingHorizontal)
+            {
+              ChangeStyle(LayoutStyle.OverlappingVertical);
+            }
+          else
+            {
+              ChangeStyle(LayoutStyle.OverlappingHorizontal);
+            }
+          // parent.DemoteZOrder(this);
+          // parent.mouseControl = null;
+          //RefreshMouseControl(state,x,y);
         }
       else
         {
@@ -101,27 +137,34 @@ private:
       return true;
     }
 
-  override bool HandleInput(InputMessage msg, SDL_Rect relativeBounds, bool handled){ return true; }
-    override bool OnMouseLeave(bool handled) { return true; }
-    override void Render(SDL_Renderer* renderer, SDL_Rect relativeBounds)
+    override bool HandleInput(TState state, InputMessage msg, SDL_Rect relativeBounds, bool handled){ return true; }
+    override bool OnMouseLeave(TState state, bool handled)
     {
-      draw(card,faces[card], renderer, relativeBounds);
+      parent.SetZOrder(this,prevIndex);
+      return true;
+    }
+    override void Render(TState state, SDL_Renderer* renderer, SDL_Rect relativeBounds)
+    {
+      draw(card,faces[card], state, renderer, relativeBounds);
     }
   }
 
-  public override void Update()
+  public override void Update(TState state)
   {
     foreach(ff;f)
-   if(ff !is null && ff.state != Fiber.State.TERM)
-    {
-      ff.call();
-    }
- 
+      if(ff !is null && ff.state != Fiber.State.TERM)
+        {
+          ff.call();
+        }
+       
+    
   }
   void ChangeStyle(LayoutStyle newStyle)
   {
     this.style = newStyle;
-    _children.clear();
+    mouseControl = null;
+    _children.length = 0;
+    f.length = 0;
     final switch(this.style)
       {
       case LayoutStyle.Stack:
@@ -156,7 +199,7 @@ private:
     int i = 0;
     foreach(c;_children)
       {
-        f ~= new LayoutFiber(c,i);
+        f ~= new LayoutFiber!TState(c,i,style);
         i++;
       }
 
@@ -165,10 +208,10 @@ private:
 public:
 
   this(
-       Control parent,
+       Control!TState parent,
        Deck!T deck,
        SDL_Rect initialCardSize,
-       void delegate(ref T,Face face, SDL_Renderer* renderer, SDL_Rect dest ) draw)
+       void delegate(ref T,Face face, TState state, SDL_Renderer* renderer, SDL_Rect dest ) draw)
   {
     super(parent);
     this.deck = deck;
@@ -177,7 +220,7 @@ public:
     bounds = initialCardSize;
     this.draw = draw;
     ChangeStyle(LayoutStyle.OverlappingVertical);
-    ChangeStyle(LayoutStyle.OverlappingHorizontal);
+    //    ChangeStyle(LayoutStyle.OverlappingHorizontal);
   }
 
   
@@ -185,13 +228,13 @@ public:
 protected:
   
 
-  override bool HandleInput(InputMessage msg, SDL_Rect relativeBounds, bool handled)
+  override bool HandleInput(TState state, InputMessage msg, SDL_Rect relativeBounds, bool handled)
   {
     return false;
   }
 
 
-  override void Render(SDL_Renderer* renderer, SDL_Rect relativeBounds)
+  override void Render(TState state, SDL_Renderer* renderer, SDL_Rect relativeBounds)
   {
     // final switch(style )
       // {

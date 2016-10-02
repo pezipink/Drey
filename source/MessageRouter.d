@@ -1,3 +1,5 @@
+
+import du;
 import std.stdio;
 alias wl = writeln;
 
@@ -47,6 +49,44 @@ public:
   }
 }
 
+struct UnionMessageRouter(UnionType)
+  if(IsUnion!UnionType)
+{
+  MessageRouter!(UnionType.Tags, UnionType) router;
+
+  void ProcessMessages() 
+  {
+    return router.ProcessMessages();
+  }
+
+  void PostMessage(UnionType t)
+  {
+    router.PostMessage(t.Tag, t);
+    
+  }
+
+  void Subscribe(UnionType.Tags key, void delegate(UnionType) action)
+  {
+    router.Subscribe(key,action);    
+  }
+  
+  void Unsubscribe(UnionType.Tags key, void delegate(UnionType) action)
+  {
+    router.Unsubscribe(key, action);
+  }
+  
+
+}
+
+unittest
+{
+  wl("**",IsUnion!TestMessage);
+  auto r = UnionMessageRouter!TestMessage();
+  r.Subscribe(TestMessage.Tags.Status, x=> wl(x.AsStatus.message));
+  r.PostMessage(new Status("hello world!"));
+  r.ProcessMessages();
+}
+
 
 version(unittest)
 {
@@ -55,7 +95,7 @@ version(unittest)
   import types;
   
   mixin(DU!q{
-      union ControlMessage =
+      union TestMessage =
         | Status of message : string
         | ZoomToCity of city : CityName * time : double
         | Etc
@@ -67,11 +107,11 @@ unittest
 {
 
   auto x = new Status("Hello");
-  auto router = MessageRouter!(ControlMessage.Tags, ControlMessage)();
+  auto router = MessageRouter!(TestMessage.Tags, TestMessage)();
 
-  router.Subscribe(ControlMessage.Tags.Status, x => wl(x.AsStatus.message));
+  router.Subscribe(TestMessage.Tags.Status, x => wl(x.AsStatus.message));
 
-  router.PostMessage(ControlMessage.Tags.Status, new Status("hello world"));
+  router.PostMessage(TestMessage.Tags.Status, new Status("hello world"));
   
   router.ProcessMessages();
 

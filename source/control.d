@@ -1,3 +1,4 @@
+
 import derelict.sdl2.sdl;
 import derelict.sdl2.image;
 import std.stdio;
@@ -31,7 +32,7 @@ bool InBounds(SDL_Rect* rect, int x, int y)
          && y > rect.y && y < rect.y + rect.h);
 }
 
-class Control
+class Control(TState)
 {
   import std.container : DList;
 
@@ -42,47 +43,102 @@ protected:
     this.parent = parent;
   }
   
-  bool HandleInput(InputMessage msg, SDL_Rect relativeBounds, bool handled) { return handled; }
-  void Update(){ return; };
-  void Render(SDL_Renderer* renderer, SDL_Rect relativeBounds) { return; }
-  bool OnMouseEnter(bool handled) { return handled; }
-  bool OnMouseLeave(bool handled) { return handled; }
-  bool OnMouseClick(bool handled, MouseButtonType button,int x, int y) { return handled; }
+  bool HandleInput(TState state, InputMessage msg, SDL_Rect relativeBounds, bool handled) { return handled; }
+  void Update(TState state, ){ return; };
+  void Render(TState state, SDL_Renderer* renderer, SDL_Rect relativeBounds) { return; }
+  bool OnMouseEnter(TState state, bool handled) { return handled; }
+  bool OnMouseLeave(TState state, bool handled) { return handled; }
+  bool OnMouseClick(TState state, bool handled, MouseButtonType button,int x, int y) { return handled; }
   // void OnRecieveMessage(T message) { return; }
   
 public:
   // the order of this list is the z-order
   // todo: probably change this to just an array for simplcity since
   // perf doesn't really matter
-  DList!Control _children; 
+  Control[] _children; 
 
   Control parent;
 
   SDL_Rect bounds;
   void AddControl(Control child)
   {
-    _children.insertBack(child);
+    _children ~= child;
   }
 
   void PromoteZOrder (Control child)
   {
     import std.range;
     import std.algorithm : find;
-    auto found = _children[].find!(x=>x==child);
-    assert(!found.empty);
-    _children.linearRemove(found.take(1));
-    _children.insertBack(found.take(1));
+    if(_children.length == 2)
+      {
+        _children = [_children[1],_children[0]];
+          return;
+      }
+    int index = 0;
+    for(index = 0; index < _children.length; index++)
+      {
+        if(_children[index] == child)
+          break;
+      }
+    if(index == _children.length-1) return;
+    
+    _children = _children[0..index] ~  _children[index+1..$] ~ _children[index];
   }
   void DemoteZOrder (Control child)
   {
     import std.range;
-    import std.algorithm : find;
-    auto found = _children[].find!(x=>x==child);
-    assert(!found.empty);
-    _children.linearRemove(found.take(1));
-    _children.insertFront(found.take(1));
+    if(_children.length == 2)
+      {
+        _children = [_children[1],_children[0]];
+        return;
+      }
+
+    int index = 0;
+    for(index = 0; index < _children.length; index++)
+      {
+        if(_children[index] == child)
+          break;
+      }
+    if(index == 0) return;
+    _children = [_children[index]] ~ _children[0..index] ~ _children[index+1..$];
   }
 
+  void SetZOrder(Control child, int position)
+  {
+    import std.range;
+    int index = 0;
+    if(position == 0)
+      {
+        DemoteZOrder(child);
+      }
+    else if(position == _children.length-1)
+      {
+        PromoteZOrder(child);
+      }
+    else
+      {
+        for(index = 0; index < _children.length; index++)
+          {
+            if(_children[index] == child)
+              break;
+          }
+        if(index == 0) return;
+        if(index == position) return;
+        
+        if(index < position)
+          {
+            _children = _children[0..index] ~ _children[index+1..position] ~ _children[index] ~ _children[position..$];
+          }
+        else
+          {
+            _children = _children[0..position] ~ _children[index] ~ _children[position.. index] ~ _children[index+1..$];
+
+          }
+
+      }
+    
+  }
+  
   SDL_Rect PerformOffset(SDL_Rect original,int xOffset, int yOffset)
   {
     SDL_Rect r;
@@ -99,14 +155,14 @@ public:
     if(parent is null) return null;
     return parent.mouseControl;
   }
-  void RefreshMouseControl(int x, int y)
+  void RefreshMouseControl(TState state,int x, int y)
   {
     parent.CoreHandleInput
-      (new MouseMove(x,y),parent.bounds,false);
+      (state, new MouseMove(x,y),parent.bounds,false);
     
   }
 
-  bool CoreHandleInput(InputMessage msg, SDL_Rect relativeBounds, bool handled)
+  bool CoreHandleInput(TState state,InputMessage msg, SDL_Rect relativeBounds, bool handled)
   {
     import std.stdio : writeln; alias wl = writeln;
     auto r = relativeBounds;
@@ -116,7 +172,7 @@ public:
     foreach_reverse(c;_children)
       {
         if(c is null) return true; // this can occur since we might modify this collection
-        handled = c.CoreHandleInput(msg, PerformOffset(c.bounds,r.x, r.y),handled);
+        handled = c.CoreHandleInput(state,msg, PerformOffset(c.bounds,r.x, r.y),handled);
       }
 
     if(msg.IsMouseMove || msg.IsMouseButton)
@@ -130,7 +186,7 @@ public:
                     if(parent !is null)
                       {
                         parent.mouseControl = this;
-                        OnMouseEnter(handled);
+                        OnMouseEnter(state,handled);
                       }
                   }
               }
@@ -144,13 +200,13 @@ public:
                     if(parent !is null)
                       {
                         parent.mouseControl = null;
-                        OnMouseLeave(handled);
+                        OnMouseLeave(state,handled);
                       }
                   }
               }
             else if(auto x = msg.AsMouseButton)
               {
-                OnMouseClick(handled,x.button,x.x,x.y);
+                OnMouseClick(state,handled,x.button,x.x,x.y);
               }
           }
      
@@ -163,21 +219,21 @@ public:
 
     
 
-    return HandleInput(msg, r, handled);
+    return HandleInput(state, msg, r, handled);
   }
 
-  void CoreUpdate()
+  void CoreUpdate(TState state)
   {
-    Update();
-    foreach(c;_children) c.CoreUpdate();
+    Update(state);
+    foreach(c;_children) c.CoreUpdate(state);
   }
 
-  void CoreRender(SDL_Renderer* renderer, SDL_Rect relativeBounds)
+  void CoreRender(TState state,SDL_Renderer* renderer, SDL_Rect relativeBounds)
   {
     // render yourself first then your children in ascending z-order
     
-    Render(renderer,relativeBounds);
-    foreach(c;_children) c.CoreRender(renderer,PerformOffset(c.bounds,relativeBounds.x, relativeBounds.y));
+    Render(state,renderer,relativeBounds);
+    foreach(c;_children) c.CoreRender(state,renderer,PerformOffset(c.bounds,relativeBounds.x, relativeBounds.y));
   }
 
   unittest

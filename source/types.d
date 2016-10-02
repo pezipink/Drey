@@ -1,4 +1,5 @@
 
+
 import du;
 import deck;
 enum CityName
@@ -8,7 +9,7 @@ enum CityName
 	Baghdad,	
 	Bangkok,	
 	Beijing,	
-	Bogotá,	
+	Bogota,	
 	BuenosAires,	
 	Cairo,	
 	Chennai,	
@@ -33,7 +34,7 @@ enum CityName
 	MexicoCity,	
 	Miami,	
 	Milan,	
-	Montréal,	
+	Montreal,
 	Moscow,	
 	Mumbai,	
 	NewYork,	

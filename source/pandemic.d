@@ -1,3 +1,4 @@
+
 import std.stdio;
 import std.typecons;
 alias wl = writeln;
@@ -26,55 +27,54 @@ Tuple!(Disease,CityName[]) GetCityData(CityName name)
   final switch(name)
     with(CityName)
       {
-      case Algiers : return tuple(Disease.Red,[Atlanta]);
+      case Algiers : return tuple(Disease.Black,[Madrid,Paris,Istanbul,Cairo]);
       case Atlanta : return tuple(Disease.Blue,[Chicago,Miami,Washington]);
-      case Baghdad : return tuple(Disease.Red,[Atlanta]);
-      case Bangkok : return tuple(Disease.Red,[Atlanta]);
-      case Beijing : return tuple(Disease.Red,[Atlanta]);
-      case Bogotá : return tuple(Disease.Red,[Atlanta]);
-      case BuenosAires : return tuple(Disease.Red,[Atlanta]);
-      case Cairo : return tuple(Disease.Red,[Atlanta]);
-      case Chennai : return tuple(Disease.Red,[Atlanta]);
-      case Chicago : return tuple(Disease.Blue,[SanFrancisco,Atlanta,LosAngeles,SanFrancisco,Montréal]);
-      case Delhi : return tuple(Disease.Red,[Atlanta]);
-      case Essen : return tuple(Disease.Blue,[Atlanta]);
-      case HoChiMinhCity : return tuple(Disease.Red,[Atlanta]);
-      case HongKong : return tuple(Disease.Red,[Atlanta]);
-      case Istanbul : return tuple(Disease.Red,[Atlanta]);
-      case Jakarta : return tuple(Disease.Red,[Atlanta]);
-      case Johannesburg : return tuple(Disease.Red,[Atlanta]);
-      case Karachi : return tuple(Disease.Red,[Atlanta]);
-      case Khartoum : return tuple(Disease.Red,[Atlanta]);
-      case Kinshasa : return tuple(Disease.Red,[Atlanta]);
-      case Kolkata : return tuple(Disease.Red,[Atlanta]);
-      case Lagos : return tuple(Disease.Red,[Atlanta]);
-      case Lima : return tuple(Disease.Red,[Atlanta]);
-      case London : return tuple(Disease.Blue,[Atlanta]);
-      case LosAngeles : return tuple(Disease.Yellow,[SanFrancisco,Chicago,MexicoCity]);         // todo
-      case Madrid : return tuple(Disease.Blue,[Atlanta]);
-      case Manila : return tuple(Disease.Red,[Atlanta]);
-      case MexicoCity : return tuple(Disease.Yellow,[LosAngeles,Chicago,Miami,Bogotá,Lima]);
-      case Miami : return tuple(Disease.Red,[Atlanta]);
-
-      case Milan : return tuple(Disease.Blue,[Atlanta]);
-      case Montréal : return tuple(Disease.Blue,[NewYork,Washington,Chicago]);
-      case Moscow : return tuple(Disease.Red,[Atlanta]);
-      case Mumbai : return tuple(Disease.Red,[Atlanta]);
-      case NewYork : return tuple(Disease.Blue,[Atlanta]);
-      case Osaka : return tuple(Disease.Red,[Atlanta]);
-      case Paris : return tuple(Disease.Blue,[Atlanta]);
-      case Riyadh : return tuple(Disease.Red,[Atlanta]);
-      case SanFrancisco : return tuple(Disease.Blue,[Chicago,LosAngeles]); //todo
-      case Santiago : return tuple(Disease.Red,[Atlanta]);
-      case SaoPaulo : return tuple(Disease.Red,[Atlanta]);
-      case Seoul : return tuple(Disease.Red,[Atlanta]);
-      case Shanghai : return tuple(Disease.Red,[Atlanta]);
-      case StPetersburg : return tuple(Disease.Blue,[Atlanta]);
-      case Sydney : return tuple(Disease.Red,[Atlanta]);
-      case Taipei : return tuple(Disease.Red,[Atlanta]);
-      case Tehran : return tuple(Disease.Red,[Atlanta]);
-      case Tokyo : return tuple(Disease.Red,[Atlanta]);
-      case Washington : return tuple(Disease.Blue,[NewYork,Montréal,Atlanta,Miami]);
+      case Baghdad : return tuple(Disease.Black,[Istanbul,Moscow,Tehran,Karachi,Riyadh,Cairo]);
+      case Bangkok : return tuple(Disease.Red,[Kolkata,HongKong,HoChiMinhCity,Jakarta,Chennai]);
+      case Beijing : return tuple(Disease.Red,[Seoul,Shanghai]);
+      case Bogota : return tuple(Disease.Yellow,[MexicoCity,Miami,SaoPaulo,BuenosAires,Lima]);
+      case BuenosAires : return tuple(Disease.Yellow,[Bogota,SaoPaulo]);
+      case Cairo : return tuple(Disease.Black,[Algiers,Istanbul,Baghdad,Riyadh,Khartoum]);
+      case Chennai : return tuple(Disease.Black,[Mumbai,Delhi,Kolkata,Bangkok]);
+      case Chicago : return tuple(Disease.Blue,[SanFrancisco,Atlanta,LosAngeles,SanFrancisco,Montreal]);
+      case Delhi : return tuple(Disease.Black,[Tehran,Kolkata,Chennai,Mumbai,Karachi]);
+      case Essen : return tuple(Disease.Blue,[London,StPetersburg,Moscow,Istanbul]);
+      case HoChiMinhCity : return tuple(Disease.Red,[Bangkok,HongKong,Manila,Jakarta]);
+      case HongKong : return tuple(Disease.Red,[Kolkata,Shanghai,Taipei,Manila,HoChiMinhCity,Bangkok]);
+      case Istanbul : return tuple(Disease.Black,[Milan,StPetersburg,Moscow,Baghdad,Cairo,Algiers]);
+      case Jakarta : return tuple(Disease.Red,[Chennai,Bangkok,HoChiMinhCity,Sydney]);
+      case Johannesburg : return tuple(Disease.Yellow,[Kinshasa,Khartoum]);
+      case Karachi : return tuple(Disease.Black,[Baghdad,Delhi,Tehran,Mumbai,Riyadh]);
+      case Khartoum : return tuple(Disease.Yellow,[Cairo,Johannesburg,Kinshasa,Lagos]);
+      case Kinshasa : return tuple(Disease.Yellow,[Lagos,Khartoum,Johannesburg]);
+      case Kolkata : return tuple(Disease.Black,[Delhi,HongKong,Bangkok,Chennai]);
+      case Lagos : return tuple(Disease.Yellow,[Khartoum,Kinshasa,SaoPaulo]);
+      case Lima : return tuple(Disease.Yellow,[MexicoCity,Bogota,Santiago]);
+      case London : return tuple(Disease.Blue,[Essen,Paris,Madrid,NewYork]);
+      case LosAngeles : return tuple(Disease.Yellow,[SanFrancisco,Chicago,MexicoCity,Sydney]);        
+      case Madrid : return tuple(Disease.Blue,[London,Paris,Algiers,SaoPaulo,NewYork]);
+      case Manila : return tuple(Disease.Red,[Taipei,Sydney,HoChiMinhCity,HongKong,SanFrancisco]);
+      case MexicoCity : return tuple(Disease.Yellow,[LosAngeles,Chicago,Miami,Bogota,Lima]);
+      case Miami : return tuple(Disease.Yellow,[Atlanta,Washington,Bogota,MexicoCity]);
+      case Milan : return tuple(Disease.Blue,[Essen,Istanbul,Paris]);
+      case Montreal : return tuple(Disease.Blue,[NewYork,Washington,Chicago]);
+      case Moscow : return tuple(Disease.Black,[StPetersburg,Tehran,Istanbul]);
+      case Mumbai : return tuple(Disease.Black,[Karachi,Delhi,Chennai]);
+      case NewYork : return tuple(Disease.Blue,[Montreal,London,Madrid,Washington]);
+      case Osaka : return tuple(Disease.Red,[Tokyo,Taipei]);
+      case Paris : return tuple(Disease.Blue,[London,Essen,Milan,Algiers,Madrid]);
+      case Riyadh : return tuple(Disease.Black,[Cairo,Baghdad,Karachi]);
+      case SanFrancisco : return tuple(Disease.Blue,[Chicago,LosAngeles,Tokyo,Manila]); 
+      case Santiago : return tuple(Disease.Yellow,[Lima]);
+      case SaoPaulo : return tuple(Disease.Yellow,[Bogota,Madrid,Lagos,BuenosAires]);
+      case Seoul : return tuple(Disease.Red,[Beijing,Tokyo,Shanghai]);
+      case Shanghai : return tuple(Disease.Red,[Beijing,Seoul,Tokyo,Taipei,HongKong]);
+      case StPetersburg : return tuple(Disease.Blue,[Essen,Moscow,Istanbul]);
+      case Sydney : return tuple(Disease.Red,[Jakarta,Manila,LosAngeles]);
+      case Taipei : return tuple(Disease.Red,[Shanghai,Osaka,Manila,HongKong]);
+      case Tehran : return tuple(Disease.Black,[Moscow,Delhi,Karachi,Baghdad]);
+      case Tokyo : return tuple(Disease.Red,[Seoul,SanFrancisco,Osaka,Shanghai]);
+      case Washington : return tuple(Disease.Blue,[NewYork,Montreal,Atlanta,Miami]);
       }
 }
 
