@@ -139,30 +139,34 @@ public class Window : Control!GameState
 public class MapControl : Control!GameState
 {
 
-private:
+ private:
   double _zoomLevel = 1.0;
   double _xOffset = 0.0;
   double _yOffset = 0.0;
   immutable _map_width = 1200.0;
   immutable _map_height = 849.0;
 
-public:
+ public:
 
   
   this(Control!GameState parent)
-  {
-    import std.path;
-    import std.string;
+    {
+      import std.path;
+      import std.string;
 
-    super(parent);
-    bounds.x = 0;
-    bounds.y = 0;
-    bounds.w = GameState.width;
-    bounds.h= GameState.height;
-    //    auto w = new Window(this,SDL_Rect(30,30,500,500));
-    //    AddControl(w);
-    //    w.Test();
-  }
+      super(parent);
+      // the map handles rendering its own childrne onto a separate texture
+      autoRenderChildren = false;
+      TextureManager.EnsureLoaded("map","images\\pandemicMap.jpg");
+      TextureManager.ReplicateAsTargetTexture("map","map_target");
+      bounds.x = 0;
+      bounds.y = 0;
+      bounds.w = GameState.width;
+      bounds.h= GameState.height;
+      //    auto w = new Window(this,SDL_Rect(30,30,500,500));
+      //    AddControl(w);
+      //    w.Test();
+    }
 
   override void Update(GameState state)
   {
@@ -211,42 +215,51 @@ public:
 
   override void Render(GameState state, SDL_Renderer* renderer, SDL_Rect relativeBounds)
   {
-    SDL_SetRenderDrawColor(renderer,255,0,0,0);
     SDL_Rect src;
     SDL_Rect dst;
     int width = cast(int)(_map_width * _zoomLevel);
     int height = cast(int)(_map_height * _zoomLevel);
+    SDL_SetRenderTarget(renderer,TextureManager.GetTexture("map_target"));
+    // copy the map
+    SDL_RenderCopy(renderer,TextureManager.GetTexture("map"),null,null);
+    // render children onto target texture
+    foreach(c;_children) c.CoreRender(state,renderer,PerformOffset(c.bounds,relativeBounds.x, relativeBounds.y));
+    // set the renderer back
+    SDL_SetRenderTarget(renderer,null);
+    // now we can render the correct portions of the map depending on scroll
+    // and zoom (todo)
+    SDL_RenderCopy(renderer,TextureManager.GetTexture("map_target"),null,null);
 
-   
-    src.x = cast(int)_xOffset;
-    src.y = cast(int)_yOffset;
-    //src.w =cast(int)( _map_width - _xOffset);
-    src.w =cast(int)( width - _xOffset);
-    src.h =cast(int)( height -_yOffset);
-
-    double wpct = 0.0;
-    if( _xOffset > 0.0 )
-      {
-	//	wpct = _xOffset / _map_width;
-       	wpct = _xOffset / width;
-      }
     
-    //dst.x = cast(int)( _state.width * wpct);
+    // src.x = cast(int)_xOffset;
+    // src.y = cast(int)_yOffset;
+    // //src.w =cast(int)( _map_width - _xOffset);
+    // src.w =cast(int)( width - _xOffset);
+    // src.h =cast(int)( height -_yOffset);
 
-    dst.x = 0;
-    dst.y = 0;
-    dst.h = cast(int)state.height - 50;
-    dst.w = cast(int)(state.width * (1.0 - wpct));
-    SDL_RenderCopy(renderer, TextureManager.GetTexture("map"), &src, &dst);
-    src.x = 0;
-    src.y = 0;
-    src.w = cast(int)_xOffset;
-    //src.h = cast(int)_yOffset;
-    dst.x =  cast(int)(state.width * (1.0 - wpct));
-    dst.y =  0;
-    dst.w = cast(int)(state.width * wpct);
-    dst.h = cast(int)state.height;
-    SDL_RenderCopy(renderer, TextureManager.GetTexture("map"), &src, &dst);
+    // double wpct = 0.0;
+    // if( _xOffset > 0.0 )
+    //   {
+    //     //	wpct = _xOffset / _map_width;
+    //    	wpct = _xOffset / width;
+    //   }
+    
+    // //dst.x = cast(int)( _state.width * wpct);
+
+    // dst.x = 0;
+    // dst.y = 0;
+    // dst.h = cast(int)state.height - 50;
+    // dst.w = cast(int)(state.width * (1.0 - wpct));
+    // SDL_RenderCopy(renderer, TextureManager.GetTexture("map"), &src, &dst);
+    // src.x = 0;
+    // src.y = 0;
+    // src.w = cast(int)_xOffset;
+    // //src.h = cast(int)_yOffset;
+    // dst.x =  cast(int)(state.width * (1.0 - wpct));
+    // dst.y =  0;
+    // dst.w = cast(int)(state.width * wpct);
+    // dst.h = cast(int)state.height;
+    // SDL_RenderCopy(renderer, TextureManager.GetTexture("map"), &src, &dst);
 
     //   }
     
@@ -325,7 +338,7 @@ class Game
   {
     TextureManager.EnsureLoaded("playercards","images\\playercards.png");
     TextureManager.EnsureLoaded("title","images\\title.jpg");
-    TextureManager.EnsureLoaded("map","images\\pandemicMap.jpg");
+
   }
 
   void CreateControls()

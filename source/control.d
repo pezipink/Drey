@@ -1,4 +1,3 @@
-
 import derelict.sdl2.sdl;
 import derelict.sdl2.image;
 import std.stdio;
@@ -37,7 +36,7 @@ class Control(TState)
   import std.container : DList;
 
 protected:
-
+  bool autoRenderChildren = true;
   this(Control parent)
   {
     this.parent = parent;
@@ -58,7 +57,8 @@ public:
   Control[] _children; 
 
   Control parent;
-
+  // this is the control the mouse is currently on
+  Control mouseControl;
   SDL_Rect bounds;
   void AddControl(Control child)
   {
@@ -149,7 +149,7 @@ public:
     return r;
   }
 
-  Control mouseControl;
+
   @property Control parentMouseControl()
   {
     if(parent is null) return null;
@@ -233,7 +233,10 @@ public:
     // render yourself first then your children in ascending z-order
     
     Render(state,renderer,relativeBounds);
-    foreach(c;_children) c.CoreRender(state,renderer,PerformOffset(c.bounds,relativeBounds.x, relativeBounds.y));
+    if(autoRenderChildren)
+      {
+        foreach(c;_children) c.CoreRender(state,renderer,PerformOffset(c.bounds,relativeBounds.x, relativeBounds.y));
+      }
   }
 
   unittest
