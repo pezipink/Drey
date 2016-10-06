@@ -6,6 +6,7 @@ import std.range;
 import du;
 import control;
 import deck;
+import types;
 
 enum LayoutStyle
   {
@@ -64,7 +65,7 @@ class LayoutFiber(TState) : Fiber
 class DeckControls(TState, T) : Control!TState
 {
   import Messages;
-private:
+ private:
   Deck!T deck;
   LayoutStyle style;
   Face[T] faces;
@@ -73,10 +74,10 @@ private:
   class Card : Control!TState
   {
     this(Control!TState parent, T card)
-    {
-      super(parent);
-      this.card = card;
-    }
+      {
+        super(parent);
+        this.card = card;
+      }
     T card;
 
     int prevIndex = 0;
@@ -93,13 +94,16 @@ private:
           prevIndex++;
         }
       parent.PromoteZOrder(this);
-      if(auto x = card.AsCityCard)
+      static if(is(T == PlayerCard))
         {
-          state.router.PostMessage(new Status(x.city.to!string));
-        }      
-      else if(auto x = card.AsEpidemicCard)
-        {
-          state.router.PostMessage(new Status("Epidemic!"));
+          if(auto x = card.AsCityCard)
+            {
+              state.router.PostMessage(new Status(x.city.to!string));
+            }      
+          else if(auto x = card.AsEpidemicCard)
+            {
+              state.router.PostMessage(new Status("Epidemic!"));
+            }
         }
       return true;
 
@@ -205,27 +209,27 @@ private:
 
   }
   
-public:
+ public:
 
   this(
        Control!TState parent,
        Deck!T deck,
        SDL_Rect initialCardSize,
        void delegate(ref T,Face face, TState state, SDL_Renderer* renderer, SDL_Rect dest ) draw)
-  {
-    super(parent);
-    this.deck = deck;
-    foreach(card; this.deck)
-      faces[card] = Face.Front;
-    bounds = initialCardSize;
-    this.draw = draw;
-    ChangeStyle(LayoutStyle.OverlappingVertical);
-    //    ChangeStyle(LayoutStyle.OverlappingHorizontal);
-  }
+    {
+      super(parent);
+      this.deck = deck;
+      foreach(card; this.deck)
+        faces[card] = Face.Front;
+      bounds = initialCardSize;
+      this.draw = draw;
+      ChangeStyle(LayoutStyle.OverlappingVertical);
+      //    ChangeStyle(LayoutStyle.OverlappingHorizontal);
+    }
 
   
 
-protected:
+ protected:
   
 
   override bool HandleInput(TState state, InputMessage msg, SDL_Rect relativeBounds, bool handled)
@@ -237,27 +241,27 @@ protected:
   override void Render(TState state, SDL_Renderer* renderer, SDL_Rect relativeBounds)
   {
     // final switch(style )
-      // {
-      // case LayoutStyle.Stack:
-      //   // just render a single card at the current size
-      //   draw(deck[0],renderer,relativeBounds);
-      //   break;
-      // case LayoutStyle.OverlappingHorizontal:
-      //   foreach(ref c;deck)
-      //     {
-      //       draw(c,renderer,relativeBounds);
-      //       relativeBounds.x += 10;
-      //     }
-      //   break;
-      // case LayoutStyle.OverlappingVertical:
-      //   foreach(ref c;deck)
-      //     {
-      //       draw(c,renderer,relativeBounds);
-      //       relativeBounds.y += 20;
-      //     }
+    // {
+    // case LayoutStyle.Stack:
+    //   // just render a single card at the current size
+    //   draw(deck[0],renderer,relativeBounds);
+    //   break;
+    // case LayoutStyle.OverlappingHorizontal:
+    //   foreach(ref c;deck)
+    //     {
+    //       draw(c,renderer,relativeBounds);
+    //       relativeBounds.x += 10;
+    //     }
+    //   break;
+    // case LayoutStyle.OverlappingVertical:
+    //   foreach(ref c;deck)
+    //     {
+    //       draw(c,renderer,relativeBounds);
+    //       relativeBounds.y += 20;
+    //     }
 
-      //   break;
-      // }
+    //   break;
+    // }
     return;
   }
 }

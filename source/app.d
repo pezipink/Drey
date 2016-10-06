@@ -168,50 +168,50 @@ public class MapControl : Control!GameState
       //    w.Test();
     }
 
-  override void Update(GameState state)
-  {
-    // if( state.IsKeyDown(7))
-    //   {
-    //     // d
+//   override void Update(GameState state)
+//   {
+//     // if( state.IsKeyDown(7))
+//     //   {
+//     //     // d
 	
-    //     _xOffset += 12.0;
-    //     if( _xOffset > _map_width * _zoomLevel)
-    //       {
-    //         _xOffset -= _map_width * _zoomLevel;
-    //       }
-    //   }
-    // if (state.IsKeyDown(4))
-    //   {
-    //     // a
-    //     _xOffset -= 12.0;
-    //     if( _xOffset < 0.0)
-    //       {
-    //         _xOffset += _map_width * _zoomLevel;
-    //       }
-    //   }
-    // if( state.IsKeyDown(26) && _zoomLevel < 1.0)
-    //   {
-    //     // w
-    //     _yOffset -= 2.0;
-    //   }
-    // if( state.IsKeyDown(22) )
-    //   {
-    //     // s
-    //     _yOffset += 2.0;
-    //   }
-    // if( state.IsKeyDown(48) && _zoomLevel < 1.0)
-    //   {
-    //     // [
-    //     _zoomLevel += 0.1;
-    //   }
-    // if( state.IsKeyDown(47) )
-    //   {
-    //     // ]
-    //     _zoomLevel -= 0.1;
-    //   }
+//     //     _xOffset += 12.0;
+//     //     if( _xOffset > _map_width * _zoomLevel)
+//     //       {
+//     //         _xOffset -= _map_width * _zoomLevel;
+//     //       }
+//     //   }
+//     // if (state.IsKeyDown(4))
+//     //   {
+//     //     // a
+//     //     _xOffset -= 12.0;
+//     //     if( _xOffset < 0.0)
+//     //       {
+//     //         _xOffset += _map_width * _zoomLevel;
+//     //       }
+//     //   }
+//     // if( state.IsKeyDown(26) && _zoomLevel < 1.0)
+//     //   {
+//     //     // w
+//     //     _yOffset -= 2.0;
+//     //   }
+//     // if( state.IsKeyDown(22) )
+//     //   {
+//     //     // s
+//     //     _yOffset += 2.0;
+//     //   }
+//     // if( state.IsKeyDown(48) && _zoomLevel < 1.0)
+//     //   {
+//     //     // [
+//     //     _zoomLevel += 0.1;
+//     //   }
+//     // if( state.IsKeyDown(47) )
+//     //   {
+//     //     // ]
+//     //     _zoomLevel -= 0.1;
+//     //   }
     
-    return;
-  }
+//     return;
+//   }
 
   override void Render(GameState state, SDL_Renderer* renderer, SDL_Rect relativeBounds)
   {
@@ -318,7 +318,7 @@ class Game
        _state.width,
        _state.height,
        SDL_WINDOW_SHOWN);
-    SDL_SetWindowFullscreen(_window,SDL_WINDOW_FULLSCREEN);
+    //SDL_SetWindowFullscreen(_window,SDL_WINDOW_FULLSCREEN);
     _state.renderer = SDL_CreateRenderer(_window,-1,SDL_RENDERER_PRESENTVSYNC | SDL_RENDERER_ACCELERATED);
     //_state.textures = SDLTextureManager(_state.renderer);
     TextureManager.SetRenderer(_state.renderer);
@@ -336,9 +336,12 @@ class Game
 
   void InitializeTextures()
   {
-    TextureManager.EnsureLoaded("playercards","images\\playercards.png");
+    TextureManager.EnsureLoaded("playercards","images\\playercards.jpg");
+    TextureManager.EnsureLoaded("rolecards","images\\rolecards.jpg");
+    TextureManager.EnsureLoaded("eventcards","images\\eventcards.jpg");
+    TextureManager.EnsureLoaded("epidemics","images\\epidemics.jpg");
+    TextureManager.EnsureLoaded("infectioncards","images\\infectioncards.jpg");
     TextureManager.EnsureLoaded("title","images\\title.jpg");
-
   }
 
   void CreateControls()
@@ -358,25 +361,65 @@ class Game
            auto tex = TextureManager.GetTexture("playercards");
            assert(tex !is null);
            SDL_Rect r;
-           r.w = 200;
-           r.h = 290;
-
+           r.w = 180;
+           r.h = 254;
+           // 255
+           // 182
            if(face == DeckControl.Face.Front)
              {
                if(auto x = card.AsEpidemicCard)
                  {
-                   r.x = 200;
+                   r.x = r.w*49;
+                 }
+               else if(auto x = card.AsCityCard)
+                 {
+                   r.x = (cast(int)x.city)*r.w;
                  }
              }
            else
              {
-               r.x = 200;
-               r.y = 290;
+               r.x = r.w*48;
+               r.y = 0;
              }
            SDL_RenderCopy(renderer, tex, &r, &dest);
 
+                            
          }());
+    auto d=
+      new DeckControls!(GameState,InfectionCard)
+      (_core,
+       _state.pandemic.infectionCards.active_deck,
+       SDL_Rect(200,0,255,182),
+       (ref card,face,state, renderer, dest) =>
+         {
+           auto tex = TextureManager.GetTexture("infectioncards");
+           assert(tex !is null);
+           SDL_Rect r;
+           r.w = 255;
+           r.h = 182;
+           // 255
+           // 182
+           if(face == DeckControl.Face.Front)
+             {
+               if(auto x = card.AsCityInfectionCard)
+                 {
+                 
+                   r.x = (cast(int)x.city)*r.w;
+                 }
+
+             }
+           else
+             {
+               r.x = r.w*48;
+               r.y = 0;
+             }
+           SDL_RenderCopy(renderer, tex, &r, &dest);
+
+                            
+         }());
+ 
     _core.AddControl(c);
+    _core.AddControl(d);
   }
     
 

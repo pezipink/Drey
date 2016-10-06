@@ -20,6 +20,7 @@ void EnsureLoaded(string key, string imagePath)
     {
       auto surf = IMG_Load(relativePath(imagePath).toStringz);
       textures[key] = SDL_CreateTextureFromSurface(_renderer,surf);
+      assert(textures[key]);
       SDL_FreeSurface(surf);
       import std.stdio;
     }
