@@ -7,7 +7,7 @@ private:
 SDL_Texture*[string] textures;
 
 SDL_Renderer* _renderer;
-  
+      import std.stdio; alias wl =writeln;
 public:
 void SetRenderer(SDL_Renderer* renderer)
 {
@@ -18,8 +18,17 @@ void EnsureLoaded(string key, string imagePath)
 {
   if(key !in textures)
     {
+  
       auto surf = IMG_Load(relativePath(imagePath).toStringz);
-      textures[key] = SDL_CreateTextureFromSurface(_renderer,surf);
+      assert(surf);
+      auto tex =SDL_CreateTextureFromSurface(_renderer,surf);
+      if(tex == null){
+        wl("failed to load texture : ", SDL_GetError().fromStringz);
+      }
+          textures[key] = tex;
+
+      wl(*SDL_GetError());
+
       assert(textures[key]);
       SDL_FreeSurface(surf);
       import std.stdio;
@@ -35,6 +44,7 @@ void ReplicateAsTargetTexture(string source, string dest)
   int w;
   int h;
   SDL_QueryTexture(textures[source],&format,&access,&w,&h);
+  wl("key ",source, "w ", w, " h ", h);
   textures[dest] = SDL_CreateTexture(_renderer,format,SDL_TEXTUREACCESS_TARGET,w,h);
   return;
 }

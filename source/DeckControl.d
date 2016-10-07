@@ -105,6 +105,18 @@ class DeckControls(TState, T) : Control!TState
               state.router.PostMessage(new Status("Epidemic!"));
             }
         }
+      else static if(is(T == InfectionCard))
+        {
+          if(auto x = card.AsCityInfectionCard)
+            {
+              state.router.PostMessage(new Status(x.city.to!string));
+            }      
+          else if(auto x = card.AsMutationCard)
+            {
+              state.router.PostMessage(new Status("Mutation!"));
+            }
+        }
+
       return true;
 
     }

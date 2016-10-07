@@ -1,3 +1,5 @@
+
+
 import derelict.sdl2.sdl;
 import derelict.sdl2.image;
 import derelict.sdl2.ttf;
@@ -22,8 +24,11 @@ public:
   bool gameRunning;
   static immutable float fps = 60.0;
   static immutable float delay_time = 1000.0 / fps;
-  static immutable int width = 1600;
-  static immutable int height = 900;
+  // static immutable int width = 1600;
+  // static immutable int height = 900;
+  static immutable int width = 1200;
+  static immutable int height = 849;
+
   SDL_Renderer* renderer;
   TTF_Font* font;
   Pandemic pandemic;
@@ -52,7 +57,104 @@ public:
 
 }
 
+public class CityControl : Control!GameState
+{
+  CityName city;
 
+  this(Control!GameState parent, CityName city)
+    {
+      super(parent);
+      this.city=city;
+      wl(city);
+      bounds = GetCityBounds(city);
+    }
+
+  public override void Update(GameState state)
+  {
+    
+  }
+  override void Render(GameState state, SDL_Renderer* renderer, SDL_Rect relativeBounds)
+  {
+    //    if(parent.mouseControl == this)
+      {
+        SDL_SetRenderDrawColor(renderer,255,0,0,0);
+        SDL_RenderDrawRect(renderer,&relativeBounds);
+        //wl("!",relativeBounds.x, " ", relativeBounds.y, relativeBounds.w);
+
+ SDL_SetRenderDrawColor(renderer,255,255,0,0);
+        SDL_RenderDrawRect(renderer,&bounds);
+       
+      }
+    
+  }
+    override bool OnMouseEnter(GameState state, bool handled)
+    {
+      import std.conv;
+      state.router.PostMessage(new Status(city.to!string));
+      return false;
+    }
+  public static SDL_Rect GetCityBounds(CityName city)
+  {
+    SDL_Rect r;
+    r.w=32;
+    r.h=32;
+    final switch(city)
+      with(CityName)
+        {
+                  case Algiers: r.x = 569; r.y = 335; break;
+                    //case Algiers: r.x = 609; r.y = 379; break;
+        case Atlanta: r.x = 236; r.y = 353; break;
+        case Baghdad: r.x = 750; r.y = 365; break;
+        case Bangkok: r.x = 974; r.y = 472; break;
+        case Beijing: r.x = 1013; r.y = 287; break;
+        case Bogota: r.x = 285; r.y = 525; break;
+        case BuenosAires: r.x = 360; r.y = 711; break;
+        case Cairo: r.x = 676; r.y = 397; break;
+        case Chennai: r.x = 913; r.y = 516; break;
+        case Chicago: r.x = 204; r.y = 285; break;
+        case Delhi: r.x = 900; r.y = 370; break;
+        case Essen: r.x = 614; r.y = 219; break;
+        case HoChiMinhCity: r.x = 1028; r.y = 537; break;
+        case HongKong: r.x = 1025; r.y = 430; break;
+        case Istanbul: r.x = 687; r.y = 319; break;
+        case Jakarta: r.x = 974; r.y = 597; break;
+        case Johannesburg: r.x = 688; r.y = 666; break;
+        case Karachi: r.x = 835; r.y = 397; break;
+        case Khartoum: r.x = 694; r.y = 489; break;
+        case Kinshasa: r.x = 635; r.y = 578; break;
+        case Kolkata: r.x = 962; r.y = 394; break;
+        case Lagos: r.x = 583; r.y = 509; break;
+        case Lima: r.x = 254; r.y = 624; break;
+        case London: r.x = 524; r.y = 236; break;
+        case LosAngeles: r.x = 109; r.y = 413; break;
+        case Madrid: r.x = 513; r.y = 328; break;
+        case Manila: r.x = 1115; r.y = 532; break;
+        case MexicoCity: r.x = 192; r.y = 445; break;
+        case Miami: r.x = 292; r.y = 430; break;
+        case Milan: r.x = 649; r.y = 263; break;
+        case Montreal: r.x = 293; r.y = 284; break;
+        case Moscow: r.x = 757; r.y = 263; break;
+        case Mumbai: r.x = 844; r.y = 465; break;
+        case NewYork: r.x = 360; r.y = 293; break;
+        case Osaka: r.x = 1160; r.y = 389; break;
+        case Paris: r.x = 589; r.y = 282; break;
+        case Riyadh: r.x = 761; r.y = 450; break;
+        case SanFrancisco: r.x = 90; r.y = 319; break;
+        case Santiago: r.x = 265; r.y = 731; break;
+        case SaoPaulo: r.x = 409; r.y = 640; break;
+        case Seoul: r.x = 1092; r.y = 281; break;
+        case Shanghai: r.x = 1018; r.y = 351; break;
+        case StPetersburg: r.x = 711; r.y = 200; break;
+        case Sydney: r.x = 1165; r.y = 724; break;
+        case Taipei: r.x = 1093; r.y = 419; break;
+        case Tehran: r.x = 818; r.y = 306; break;
+        case Tokyo: r.x = 1153; r.y = 317; break;
+        case Washington: r.x = 330; r.y = 347; break;
+        }
+    return r;
+  }
+
+}
 public class StatusControl : Control!GameState
 {
   import Messages;
@@ -148,7 +250,7 @@ public class MapControl : Control!GameState
 
  public:
 
-  
+  int city  = -1;
   this(Control!GameState parent)
     {
       import std.path;
@@ -166,70 +268,105 @@ public class MapControl : Control!GameState
       //    auto w = new Window(this,SDL_Rect(30,30,500,500));
       //    AddControl(w);
       //    w.Test();
+      for(int i =0; i<48; i++)
+        {
+          AddControl(new CityControl(this,cast(CityName)i));
+        }
     }
 
-//   override void Update(GameState state)
-//   {
-//     // if( state.IsKeyDown(7))
-//     //   {
-//     //     // d
+  void UpdateCity(GameState state)
+  {
+    city++;
+    auto c = cast(CityName)city;
+    import std.conv : to;
+    state.router.PostMessage(new Status(c.to!string));
+  }
+    override bool OnMouseClick(GameState state, bool handled, MouseButtonType button, int x, int y)
+    {
+          import std.conv : to;
+          auto c = cast(CityName)city;
+      import std.stdio; alias wl = writeln;
+      wl(x, " " , y);
+      wl("case ",c.to!string, ": r.x = ", state.mouseX, "; r.y = ", state.mouseY, "; break;\n");
+      UpdateCity(state);
+      return true;
+    }
+  
+    override void Update(GameState state)
+    {
+      if(city == -1 ) UpdateCity(state);
+    }
+  //   {
+  //     // if( state.IsKeyDown(7))
+  //     //   {
+  //     //     // d
 	
-//     //     _xOffset += 12.0;
-//     //     if( _xOffset > _map_width * _zoomLevel)
-//     //       {
-//     //         _xOffset -= _map_width * _zoomLevel;
-//     //       }
-//     //   }
-//     // if (state.IsKeyDown(4))
-//     //   {
-//     //     // a
-//     //     _xOffset -= 12.0;
-//     //     if( _xOffset < 0.0)
-//     //       {
-//     //         _xOffset += _map_width * _zoomLevel;
-//     //       }
-//     //   }
-//     // if( state.IsKeyDown(26) && _zoomLevel < 1.0)
-//     //   {
-//     //     // w
-//     //     _yOffset -= 2.0;
-//     //   }
-//     // if( state.IsKeyDown(22) )
-//     //   {
-//     //     // s
-//     //     _yOffset += 2.0;
-//     //   }
-//     // if( state.IsKeyDown(48) && _zoomLevel < 1.0)
-//     //   {
-//     //     // [
-//     //     _zoomLevel += 0.1;
-//     //   }
-//     // if( state.IsKeyDown(47) )
-//     //   {
-//     //     // ]
-//     //     _zoomLevel -= 0.1;
-//     //   }
+  //     //     _xOffset += 12.0;
+  //     //     if( _xOffset > _map_width * _zoomLevel)
+  //     //       {
+  //     //         _xOffset -= _map_width * _zoomLevel;
+  //     //       }
+  //     //   }
+  //     // if (state.IsKeyDown(4))
+  //     //   {
+  //     //     // a
+  //     //     _xOffset -= 12.0;
+  //     //     if( _xOffset < 0.0)
+  //     //       {
+  //     //         _xOffset += _map_width * _zoomLevel;
+  //     //       }
+  //     //   }
+  //     // if( state.IsKeyDown(26) && _zoomLevel < 1.0)
+  //     //   {
+  //     //     // w
+  //     //     _yOffset -= 2.0;
+  //     //   }
+  //     // if( state.IsKeyDown(22) )
+  //     //   {
+  //     //     // s
+  //     //     _yOffset += 2.0;
+  //     //   }
+  //     // if( state.IsKeyDown(48) && _zoomLevel < 1.0)
+  //     //   {
+  //     //     // [
+  //     //     _zoomLevel += 0.1;
+  //     //   }
+  //     // if( state.IsKeyDown(47) )
+  //     //   {
+  //     //     // ]
+  //     //     _zoomLevel -= 0.1;
+  //     //   }
     
-//     return;
-//   }
+  //     return;
+  //   }
 
   override void Render(GameState state, SDL_Renderer* renderer, SDL_Rect relativeBounds)
   {
     SDL_Rect src;
     SDL_Rect dst;
-    int width = cast(int)(_map_width * _zoomLevel);
-    int height = cast(int)(_map_height * _zoomLevel);
+    SDL_Rect map;
+    map.w = 1200;
+    map.h =849;
+    // int width = cast(int)(_map_width * _zoomLevel);
+    // int height = cast(int)(_map_height * _zoomLevel);
     SDL_SetRenderTarget(renderer,TextureManager.GetTexture("map_target"));
     // copy the map
-    SDL_RenderCopy(renderer,TextureManager.GetTexture("map"),null,null);
+    SDL_RenderCopy(renderer,TextureManager.GetTexture("map"),&map,&map);
     // render children onto target texture
-    foreach(c;_children) c.CoreRender(state,renderer,PerformOffset(c.bounds,relativeBounds.x, relativeBounds.y));
+    foreach(c;_children) c.CoreRender(state,renderer,PerformOffset(c.bounds,0,0));
     // set the renderer back
     SDL_SetRenderTarget(renderer,null);
     // now we can render the correct portions of the map depending on scroll
     // and zoom (todo)
-    SDL_RenderCopy(renderer,TextureManager.GetTexture("map_target"),null,null);
+    SDL_RenderCopy(renderer,TextureManager.GetTexture("map_target"),&map,&map);
 
+    SDL_Rect r;
+    r.w = 32;
+    r.h = 32;
+    r.x = state.mouseX;
+    r.y = state.mouseY;
+    SDL_SetRenderDrawColor(renderer,255,255,255,0);
+    SDL_RenderDrawRect(renderer,&r);
     
     // src.x = cast(int)_xOffset;
     // src.y = cast(int)_yOffset;
@@ -318,8 +455,12 @@ class Game
        _state.width,
        _state.height,
        SDL_WINDOW_SHOWN);
-    //SDL_SetWindowFullscreen(_window,SDL_WINDOW_FULLSCREEN);
+
+    SDL_SetWindowFullscreen(_window,SDL_WINDOW_FULLSCREEN);
     _state.renderer = SDL_CreateRenderer(_window,-1,SDL_RENDERER_PRESENTVSYNC | SDL_RENDERER_ACCELERATED);
+    int w, h ;
+    SDL_GetWindowSize(_window,&w,&h);
+    wl("window state : ", w, " ", h);
     //_state.textures = SDLTextureManager(_state.renderer);
     TextureManager.SetRenderer(_state.renderer);
     _state.pandemic = new Pandemic([Role.Tags.Medic,Role.Tags.Scientist],5);
@@ -336,12 +477,13 @@ class Game
 
   void InitializeTextures()
   {
-    TextureManager.EnsureLoaded("playercards","images\\playercards.jpg");
-    TextureManager.EnsureLoaded("rolecards","images\\rolecards.jpg");
+    
+    TextureManager.EnsureLoaded("roletcards","images\\rolecards.jpg");
     TextureManager.EnsureLoaded("eventcards","images\\eventcards.jpg");
     TextureManager.EnsureLoaded("epidemics","images\\epidemics.jpg");
     TextureManager.EnsureLoaded("infectioncards","images\\infectioncards.jpg");
     TextureManager.EnsureLoaded("title","images\\title.jpg");
+    TextureManager.EnsureLoaded("playercards","images\\playercards.jpg");
   }
 
   void CreateControls()
@@ -367,13 +509,21 @@ class Game
            // 182
            if(face == DeckControl.Face.Front)
              {
-               if(auto x = card.AsEpidemicCard)
+               if(auto z = card.AsEpidemicCard)
                  {
-                   r.x = r.w*49;
+                   int x = 49 % 25;
+                   int y = 49 / 2;
+                   r.x = r.w*x;
+                   r.y = r.h*y;
                  }
-               else if(auto x = card.AsCityCard)
+               else if(auto z = card.AsCityCard)
                  {
-                   r.x = (cast(int)x.city)*r.w;
+                   int c = (cast(int)z.city);
+                   int x = c % 25;
+                   int y = c % 2;
+                   r.x = r.w*x;
+                   r.y = r.h*y;
+
                  }
              }
            else
@@ -401,25 +551,28 @@ class Game
            // 182
            if(face == DeckControl.Face.Front)
              {
-               if(auto x = card.AsCityInfectionCard)
+               if(auto z = card.AsCityInfectionCard)
                  {
-                 
-                   r.x = (cast(int)x.city)*r.w;
+                   int c = (cast(int)z.city);
+                   int x = c % 25;
+                   int y = c / 25;
+                   r.x = r.w*x;
+                   r.y = r.h*y;
                  }
 
              }
            else
              {
-               r.x = r.w*48;
-               r.y = 0;
+               r.x = r.w*23;
+               r.y = r.h;
              }
            SDL_RenderCopy(renderer, tex, &r, &dest);
 
                             
          }());
  
-    _core.AddControl(c);
-    _core.AddControl(d);
+    // _core.AddControl(c);
+    // _core.AddControl(d);
   }
     
 
