@@ -9,5 +9,5 @@ mixin(DU!q{
 
     Union ControlMessages =
       | Status of message : string
-
+      | Test
       });

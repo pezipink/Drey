@@ -1,4 +1,3 @@
-
 import du;
 import std.stdio;
 alias wl = writeln;
@@ -65,17 +64,18 @@ struct UnionMessageRouter(UnionType)
     
   }
 
-  void Subscribe(UnionType.Tags key, void delegate(UnionType) action)
+  void Subscribe(UnionCaseType)(void delegate(UnionCaseType) action)
+    if(IsDescendantFromUnion!(UnionType,UnionCaseType))
   {
-    router.Subscribe(key,action);    
+    mixin("router.Subscribe(UnionCaseType.__compileTimeTag,x=>action(x.As"~UnionCaseType.stringof~"));");
   }
   
   void Unsubscribe(UnionType.Tags key, void delegate(UnionType) action)
   {
     router.Unsubscribe(key, action);
   }
-  
 
+  
 }
 
 unittest
@@ -85,6 +85,8 @@ unittest
   r.Subscribe(TestMessage.Tags.Status, x=> wl(x.AsStatus.message));
   r.PostMessage(new Status("hello world!"));
   r.ProcessMessages();
+  assert(IsDescendantFromUnion!(TestMessage, Status));
+  //assert(IsDescendantFromUnion!(TestMessage, PlayerCard));
 }
 
 

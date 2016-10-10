@@ -60,6 +60,18 @@ public:
   // this is the control the mouse is currently on
   Control mouseControl;
   SDL_Rect bounds;
+
+  void CoreInitialize(TState state)
+  {
+    Initialize(state);
+    foreach(c;_children)c.CoreInitialize(state);
+  }
+  
+  void Initialize(TState state)
+  {
+    return;
+  }
+  
   void AddControl(Control child)
   {
     _children ~= child;

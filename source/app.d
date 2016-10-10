@@ -1,5 +1,3 @@
-
-
 import derelict.sdl2.sdl;
 import derelict.sdl2.image;
 import derelict.sdl2.ttf;
@@ -24,10 +22,10 @@ public:
   bool gameRunning;
   static immutable float fps = 60.0;
   static immutable float delay_time = 1000.0 / fps;
-  // static immutable int width = 1600;
-  // static immutable int height = 900;
-  static immutable int width = 1200;
-  static immutable int height = 849;
+  static immutable int width = 1600;
+  static immutable int height = 900;
+  // static immutable int width = 1200;
+  // static immutable int height = 849;
 
   SDL_Renderer* renderer;
   TTF_Font* font;
@@ -76,23 +74,23 @@ public class CityControl : Control!GameState
   override void Render(GameState state, SDL_Renderer* renderer, SDL_Rect relativeBounds)
   {
     //    if(parent.mouseControl == this)
-      {
-        SDL_SetRenderDrawColor(renderer,255,0,0,0);
-        SDL_RenderDrawRect(renderer,&relativeBounds);
-        //wl("!",relativeBounds.x, " ", relativeBounds.y, relativeBounds.w);
+    {
+      SDL_SetRenderDrawColor(renderer,255,0,0,0);
+      SDL_RenderDrawRect(renderer,&relativeBounds);
+      //wl("!",relativeBounds.x, " ", relativeBounds.y, relativeBounds.w);
 
- SDL_SetRenderDrawColor(renderer,255,255,0,0);
-        SDL_RenderDrawRect(renderer,&bounds);
+      SDL_SetRenderDrawColor(renderer,255,255,0,0);
+      SDL_RenderDrawRect(renderer,&bounds);
        
-      }
+    }
     
   }
-    override bool OnMouseEnter(GameState state, bool handled)
-    {
-      import std.conv;
-      state.router.PostMessage(new Status(city.to!string));
-      return false;
-    }
+  override bool OnMouseEnter(GameState state, bool handled)
+  {
+    import std.conv;
+    state.router.PostMessage(new Status(city.to!string));
+    return false;
+  }
   public static SDL_Rect GetCityBounds(CityName city)
   {
     SDL_Rect r;
@@ -101,55 +99,56 @@ public class CityControl : Control!GameState
     final switch(city)
       with(CityName)
         {
-                  case Algiers: r.x = 569; r.y = 335; break;
-                    //case Algiers: r.x = 609; r.y = 379; break;
-        case Atlanta: r.x = 236; r.y = 353; break;
-        case Baghdad: r.x = 750; r.y = 365; break;
-        case Bangkok: r.x = 974; r.y = 472; break;
-        case Beijing: r.x = 1013; r.y = 287; break;
-        case Bogota: r.x = 285; r.y = 525; break;
-        case BuenosAires: r.x = 360; r.y = 711; break;
-        case Cairo: r.x = 676; r.y = 397; break;
-        case Chennai: r.x = 913; r.y = 516; break;
-        case Chicago: r.x = 204; r.y = 285; break;
-        case Delhi: r.x = 900; r.y = 370; break;
-        case Essen: r.x = 614; r.y = 219; break;
-        case HoChiMinhCity: r.x = 1028; r.y = 537; break;
-        case HongKong: r.x = 1025; r.y = 430; break;
-        case Istanbul: r.x = 687; r.y = 319; break;
-        case Jakarta: r.x = 974; r.y = 597; break;
-        case Johannesburg: r.x = 688; r.y = 666; break;
-        case Karachi: r.x = 835; r.y = 397; break;
-        case Khartoum: r.x = 694; r.y = 489; break;
-        case Kinshasa: r.x = 635; r.y = 578; break;
-        case Kolkata: r.x = 962; r.y = 394; break;
-        case Lagos: r.x = 583; r.y = 509; break;
-        case Lima: r.x = 254; r.y = 624; break;
-        case London: r.x = 524; r.y = 236; break;
-        case LosAngeles: r.x = 109; r.y = 413; break;
-        case Madrid: r.x = 513; r.y = 328; break;
-        case Manila: r.x = 1115; r.y = 532; break;
-        case MexicoCity: r.x = 192; r.y = 445; break;
-        case Miami: r.x = 292; r.y = 430; break;
-        case Milan: r.x = 649; r.y = 263; break;
-        case Montreal: r.x = 293; r.y = 284; break;
-        case Moscow: r.x = 757; r.y = 263; break;
-        case Mumbai: r.x = 844; r.y = 465; break;
-        case NewYork: r.x = 360; r.y = 293; break;
-        case Osaka: r.x = 1160; r.y = 389; break;
-        case Paris: r.x = 589; r.y = 282; break;
-        case Riyadh: r.x = 761; r.y = 450; break;
-        case SanFrancisco: r.x = 90; r.y = 319; break;
-        case Santiago: r.x = 265; r.y = 731; break;
-        case SaoPaulo: r.x = 409; r.y = 640; break;
-        case Seoul: r.x = 1092; r.y = 281; break;
-        case Shanghai: r.x = 1018; r.y = 351; break;
-        case StPetersburg: r.x = 711; r.y = 200; break;
-        case Sydney: r.x = 1165; r.y = 724; break;
-        case Taipei: r.x = 1093; r.y = 419; break;
-        case Tehran: r.x = 818; r.y = 306; break;
-        case Tokyo: r.x = 1153; r.y = 317; break;
-        case Washington: r.x = 330; r.y = 347; break;
+
+        case Algiers: r.x = 571; r.y = 335; break;
+        case Atlanta: r.x = 222; r.y = 309; break;
+        case Baghdad: r.x = 703; r.y = 322; break;
+        case Bangkok: r.x = 912; r.y = 413; break;
+        case Beijing: r.x = 948; r.y = 252; break;
+        case Bogota: r.x = 267; r.y = 463; break;
+        case BuenosAires: r.x = 335; r.y = 625; break;
+        case Cairo: r.x = 633; r.y = 351; break;
+        case Chennai: r.x = 854; r.y = 453; break;
+        case Chicago: r.x = 190; r.y = 249; break;
+        case Delhi: r.x = 842; r.y = 325; break;
+        case Essen: r.x = 574; r.y = 193; break;
+        case HoChiMinhCity: r.x = 964; r.y = 473; break;
+        case HongKong: r.x = 962; r.y = 378; break;
+        case Istanbul: r.x = 643; r.y = 280; break;
+        case Jakarta: r.x = 912; r.y = 526; break;
+        case Johannesburg: r.x = 644; r.y = 587; break;
+        case Karachi: r.x = 782; r.y = 349; break;
+        case Khartoum: r.x = 649; r.y = 432; break;
+        case Kinshasa: r.x = 597; r.y = 504; break;
+        case Kolkata: r.x = 900; r.y = 345; break;
+        case Lagos: r.x = 544; r.y = 447; break;
+        case Lima: r.x = 236; r.y = 551; break;
+        case London: r.x = 491; r.y = 206; break;
+        case LosAngeles: r.x = 102; r.y = 361; break;
+        case Madrid: r.x = 479; r.y = 289; break;
+        case Manila: r.x = 1045; r.y = 469; break;
+        case MexicoCity: r.x = 178; r.y = 391; break;
+        case Miami: r.x = 274; r.y = 378; break;
+        case Milan: r.x = 608; r.y = 232; break;
+        case Montreal: r.x = 273; r.y = 248; break;
+        case Moscow: r.x = 708; r.y = 229; break;
+        case Mumbai: r.x = 791; r.y = 411; break;
+        case NewYork: r.x = 335; r.y = 257; break;
+        case Osaka: r.x = 1085; r.y = 342; break;
+        case Paris: r.x = 551; r.y = 247; break;
+        case Riyadh: r.x = 711; r.y = 397; break;
+        case SanFrancisco: r.x = 84; r.y = 278; break;
+        case Santiago: r.x = 248; r.y = 643; break;
+        case SaoPaulo: r.x = 383; r.y = 565; break;
+        case Seoul: r.x = 1020; r.y = 248; break;
+        case Shanghai: r.x = 953; r.y = 309; break;
+        case StPetersburg: r.x = 665; r.y = 175; break;
+        case Sydney: r.x = 1091; r.y = 637; break;
+        case Taipei: r.x = 1026; r.y = 368; break;
+        case Tehran: r.x = 765; r.y = 271; break;
+        case Tokyo: r.x = 1084; r.y = 282; break;
+        case Washington: r.x = 308; r.y = 307; break;
+
         }
     return r;
   }
@@ -160,14 +159,14 @@ public class StatusControl : Control!GameState
   import Messages;
   string text = "hello world!";
 
-  void HandleUpdate(ControlMessages message)
+  void HandleUpdate(Status message)
   {
-    text = message.AsStatus.message;
+    text = message.message;
   }
   this(CoreControl parent, GameState state)
   {
     super(parent);
-    state.router.Subscribe(ControlMessages.Tags.Status, &HandleUpdate);
+    state.router.Subscribe!Status(&HandleUpdate);
   }
   override void Render(GameState state, SDL_Renderer* renderer, SDL_Rect relativeBounds)
   {
@@ -245,8 +244,8 @@ public class MapControl : Control!GameState
   double _zoomLevel = 1.0;
   double _xOffset = 0.0;
   double _yOffset = 0.0;
-  immutable _map_width = 1200.0;
-  immutable _map_height = 849.0;
+  immutable _map_width = 1200;
+  immutable _map_height = 849;
 
  public:
 
@@ -258,44 +257,179 @@ public class MapControl : Control!GameState
 
       super(parent);
       // the map handles rendering its own childrne onto a separate texture
-      autoRenderChildren = false;
+      //autoRenderChildren = false;
       TextureManager.EnsureLoaded("map","images\\pandemicMap.jpg");
       TextureManager.ReplicateAsTargetTexture("map","map_target");
-      bounds.x = 0;
+      bounds.x = (GameState.width - _map_width) / 2 ;
       bounds.y = 0;
-      bounds.w = GameState.width;
-      bounds.h= GameState.height;
-      //    auto w = new Window(this,SDL_Rect(30,30,500,500));
-      //    AddControl(w);
-      //    w.Test();
+      bounds.w =_map_width;
+      bounds.h= _map_height;
+
+      // infection deck
+      // 914, 45
+      // 177, 126
+      // auto c =
+
       for(int i =0; i<48; i++)
         {
           AddControl(new CityControl(this,cast(CityName)i));
         }
     }
 
+  override void Initialize(GameState state)
+  {
+    // infection deck
+    // 914, 45
+    // 177, 126
+    auto c =
+      new DeckControls!(GameState,PlayerCard)
+      (this,
+       state.pandemic.playerCards.active_deck,
+       SDL_Rect(357,310,129,180),
+       (ref card,face,state, renderer, dest) =>
+         {
+           auto tex = TextureManager.GetTexture("playercards");
+           assert(tex !is null);
+           SDL_Rect r;
+           r.w = 180;
+           r.h = 254;
+           if(face == DeckControl.Face.Front)             
+             {
+               if(auto z = card.AsEpidemicCard)
+                 {
+                   int x = 49 % 25;
+                   int y = 49 / 25;
+                   r.x = r.w*x;
+                   r.y = r.h*y;
+                 }
+               else if(auto z = card.AsCityCard)
+                 {
+                   int c = (cast(int)z.city);
+                   int x = c % 25;
+                   int y = c / 25;
+                   r.x = r.w*x;
+                   r.y = r.h*y;
+
+                 }
+             }
+           else
+             {
+               int x = 48 % 25;
+               int y = 48 / 25;
+               r.x = r.w*x;
+               r.y = r.h*y;
+             }
+           SDL_RenderCopy(renderer, tex, &r, &dest);
+
+                            
+         }());
+    auto c2 =
+      new DeckControls!(GameState,PlayerCard)
+      (this,
+       state.pandemic.playerCards.discard_deck,
+       SDL_Rect(400,310,129,180),
+       (ref card,face,state, renderer, dest) =>
+         {
+           auto tex = TextureManager.GetTexture("playercards");
+           assert(tex !is null);
+           SDL_Rect r;
+           r.w = 180;
+           r.h = 254;
+           if(face == DeckControl.Face.Front)             
+             {
+               if(auto z = card.AsEpidemicCard)
+                 {
+                   int x = 49 % 25;
+                   int y = 49 / 25;
+                   r.x = r.w*x;
+                   r.y = r.h*y;
+                 }
+               else if(auto z = card.AsCityCard)
+                 {
+                   int c = (cast(int)z.city);
+                   int x = c % 25;
+                   int y = c / 25;
+                   r.x = r.w*x;
+                   r.y = r.h*y;
+
+                 }
+             }
+           else
+             {
+               int x = 48 % 25;
+               int y = 48 / 25;
+               r.x = r.w*x;
+               r.y = r.h*y;
+             }
+           SDL_RenderCopy(renderer, tex, &r, &dest);
+
+                            
+         }());
+
+
+    auto d=
+      new DeckControls!(GameState,InfectionCard)
+      (this,
+       state.pandemic.infectionCards.active_deck,
+       SDL_Rect(355,25,177,126),
+       (ref card,face,state, renderer, dest) =>
+         {
+           auto tex = TextureManager.GetTexture("infectioncards");
+           assert(tex !is null);
+           SDL_Rect r;
+           r.w = 255;
+           r.h = 182;
+           // 255
+           // 182
+           if(face == DeckControl.Face.Front)
+             {
+               if(auto z = card.AsCityInfectionCard)
+                 {
+                   int c = (cast(int)z.city);
+                   int x = c % 25;
+                   int y = c / 25;
+                   r.x = r.w*x;
+                   r.y = r.h*y;
+                 }
+
+             }
+           else
+             {
+               r.x = r.w*23;
+               r.y = r.h;
+             }
+           SDL_RenderCopy(renderer, tex, &r, &dest);
+
+                            
+         }());
+
+    c.EnsureFaces(Face.Back);
+    d.EnsureFaces(Face.Back);
+    AddControl(c);
+    AddControl(c2);
+    AddControl(d);
+    wl("here");
+  }
+  
   void UpdateCity(GameState state)
   {
     city++;
     auto c = cast(CityName)city;
     import std.conv : to;
-    state.router.PostMessage(new Status(c.to!string));
+
   }
-    override bool OnMouseClick(GameState state, bool handled, MouseButtonType button, int x, int y)
-    {
-          import std.conv : to;
-          auto c = cast(CityName)city;
-      import std.stdio; alias wl = writeln;
-      wl(x, " " , y);
-      wl("case ",c.to!string, ": r.x = ", state.mouseX, "; r.y = ", state.mouseY, "; break;\n");
-      UpdateCity(state);
-      return true;
-    }
+  override bool OnMouseClick(GameState state, bool handled, MouseButtonType button, int x, int y)
+  {
+    import std.conv : to;
+    auto c = cast(CityName)city;
+    import std.stdio; alias wl = writeln;
+    return true;
+  }
   
-    override void Update(GameState state)
-    {
-      if(city == -1 ) UpdateCity(state);
-    }
+  override void Update(GameState state)
+  {
+    if(city == -1 ) UpdateCity(state);
+  }
   //   {
   //     // if( state.IsKeyDown(7))
   //     //   {
@@ -345,20 +479,21 @@ public class MapControl : Control!GameState
     SDL_Rect src;
     SDL_Rect dst;
     SDL_Rect map;
-    map.w = 1200;
-    map.h =849;
+    map.w = 600;
+    map.h = 424;
+
     // int width = cast(int)(_map_width * _zoomLevel);
     // int height = cast(int)(_map_height * _zoomLevel);
-    SDL_SetRenderTarget(renderer,TextureManager.GetTexture("map_target"));
+    //SDL_SetRenderTarget(renderer,TextureManager.GetTexture("map_target"));
     // copy the map
-    SDL_RenderCopy(renderer,TextureManager.GetTexture("map"),&map,&map);
+    SDL_RenderCopy(renderer,TextureManager.GetTexture("map"),null,&relativeBounds);
     // render children onto target texture
-    foreach(c;_children) c.CoreRender(state,renderer,PerformOffset(c.bounds,0,0));
+    //foreach(c;_children) c.CoreRender(state,renderer,bounds);
     // set the renderer back
-    SDL_SetRenderTarget(renderer,null);
+    //SDL_SetRenderTarget(renderer,null);
     // now we can render the correct portions of the map depending on scroll
     // and zoom (todo)
-    SDL_RenderCopy(renderer,TextureManager.GetTexture("map_target"),&map,&map);
+    //SDL_RenderCopy(renderer,TextureManager.GetTexture("map_target"),null,&bounds);
 
     SDL_Rect r;
     r.w = 32;
@@ -415,13 +550,14 @@ public class MapControl : Control!GameState
 class CoreControl : Control!GameState
 {
 
-public:
+ public:
   this()
-  {
-    super(null);
-  }
+    {
+      super(null);
+    }
 
-protected:
+
+ protected:
   
   override bool HandleInput(GameState state, InputMessage msg, SDL_Rect relativeBounds, bool handled)
   {
@@ -456,7 +592,7 @@ class Game
        _state.height,
        SDL_WINDOW_SHOWN);
 
-    SDL_SetWindowFullscreen(_window,SDL_WINDOW_FULLSCREEN);
+    //SDL_SetWindowFullscreen(_window,SDL_WINDOW_FULLSCREEN);
     _state.renderer = SDL_CreateRenderer(_window,-1,SDL_RENDERER_PRESENTVSYNC | SDL_RENDERER_ACCELERATED);
     int w, h ;
     SDL_GetWindowSize(_window,&w,&h);
@@ -472,7 +608,17 @@ class Game
 
     _core = new CoreControl();
     CreateControls();
+    _core.CoreInitialize(_state);
     _state.gameRunning = true;
+    //    _state.router.Subscribe!ControlMessages.Tags.Test(HandleUpdate);
+
+  }
+  void HandleUpdate(Test message)
+  {
+    wl("here!!");
+    _state.pandemic.playerCards.discard(_state.pandemic.playerCards.drawSingle());
+    wl("cc ", _state.pandemic.playerCards.active_deck.length);
+
   }
 
   void InitializeTextures()
@@ -493,86 +639,6 @@ class Game
     status.bounds.x = GameState.width/2-100;
     status.bounds.y = GameState.height-50;
     _core.AddControl(status);
-    auto c =
-      new DeckControls!(GameState,PlayerCard)
-      (_core,
-       _state.pandemic.playerCards.active_deck,
-       SDL_Rect(0,0,100,140),
-       (ref card,face,state, renderer, dest) =>
-         {
-           auto tex = TextureManager.GetTexture("playercards");
-           assert(tex !is null);
-           SDL_Rect r;
-           r.w = 180;
-           r.h = 254;
-           // 255
-           // 182
-           if(face == DeckControl.Face.Front)
-             {
-               if(auto z = card.AsEpidemicCard)
-                 {
-                   int x = 49 % 25;
-                   int y = 49 / 2;
-                   r.x = r.w*x;
-                   r.y = r.h*y;
-                 }
-               else if(auto z = card.AsCityCard)
-                 {
-                   int c = (cast(int)z.city);
-                   int x = c % 25;
-                   int y = c % 2;
-                   r.x = r.w*x;
-                   r.y = r.h*y;
-
-                 }
-             }
-           else
-             {
-               r.x = r.w*48;
-               r.y = 0;
-             }
-           SDL_RenderCopy(renderer, tex, &r, &dest);
-
-                            
-         }());
-    auto d=
-      new DeckControls!(GameState,InfectionCard)
-      (_core,
-       _state.pandemic.infectionCards.active_deck,
-       SDL_Rect(200,0,255,182),
-       (ref card,face,state, renderer, dest) =>
-         {
-           auto tex = TextureManager.GetTexture("infectioncards");
-           assert(tex !is null);
-           SDL_Rect r;
-           r.w = 255;
-           r.h = 182;
-           // 255
-           // 182
-           if(face == DeckControl.Face.Front)
-             {
-               if(auto z = card.AsCityInfectionCard)
-                 {
-                   int c = (cast(int)z.city);
-                   int x = c % 25;
-                   int y = c / 25;
-                   r.x = r.w*x;
-                   r.y = r.h*y;
-                 }
-
-             }
-           else
-             {
-               r.x = r.w*23;
-               r.y = r.h;
-             }
-           SDL_RenderCopy(renderer, tex, &r, &dest);
-
-                            
-         }());
- 
-    // _core.AddControl(c);
-    // _core.AddControl(d);
   }
     
 

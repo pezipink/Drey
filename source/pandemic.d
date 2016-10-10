@@ -1,4 +1,3 @@
-
 import std.stdio;
 import std.typecons;
 alias wl = writeln;
@@ -89,8 +88,8 @@ final class Pandemic
   int activePlayer;
 
   // the player and infection deck / discard decks
-  DeckPair!PlayerCard playerCards;
-  DeckPair!InfectionCard infectionCards;
+  DeckPair!PlayerCard playerCards = new DeckPair!PlayerCard();
+  DeckPair!InfectionCard infectionCards = new DeckPair!InfectionCard();
 
   // counters / misc flags
   int outbreaks;
@@ -140,7 +139,7 @@ final class Pandemic
     foreach(r;roles)
       {
         Player p;
-        
+        p.cards = new Deck!PlayerCard(); 
         p.location = CityName.Atlanta;
         final switch(r)
           {
@@ -164,7 +163,7 @@ final class Pandemic
     Deck!(PlayerCard)[] decks;
     for(int x = 0; x < epidemicCards; x++)
       {
-        Deck!PlayerCard deck;
+        Deck!PlayerCard deck = new Deck!PlayerCard();
         if( x == epidemicCards-1)
           {
             // the last deck, give it the remaining cards incase of rounding errors

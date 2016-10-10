@@ -9,7 +9,7 @@ public enum DrawType
     Bottom
   }
 
-struct Deck(T)
+class Deck(T)
 {
   import std.array : insertInPlace;
   import std.random : randomShuffle;
@@ -20,6 +20,10 @@ struct Deck(T)
 
   @property int length() { return items.length; }
 
+  this()
+  {
+  }
+  
   this(T[] items)
   {
     this.items = items;
@@ -130,7 +134,7 @@ unittest
   import std.stdio;
   import std.random;
 
-  auto d = Deck!string();
+  auto d = new Deck!string();
   d.placeBottom("hello");
   assert(d.items == ["hello"]);
   d.placeTop("world");
@@ -155,10 +159,10 @@ unittest
 
 
 
-struct DeckPair(T)
+class DeckPair(T)
 {
-  Deck!T active_deck;
-  Deck!T discard_deck;
+  Deck!T active_deck = new Deck!T();
+  Deck!T discard_deck = new Deck!T();
 
   auto draw(int n) 
     in { assert(n <= active_deck.length + discard_deck.length); }
@@ -173,7 +177,7 @@ struct DeckPair(T)
           auto temp = active_deck.draw(active_deck.length);
           auto swap = active_deck;
           active_deck = discard_deck;
-          discard_deck = active_deck;
+         discard_deck = active_deck;
           discard_deck.shuffle();
           return temp ~ active_deck.draw(n-temp.length);
         }

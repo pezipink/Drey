@@ -60,6 +60,7 @@ string Generate(UnionData[] unions)
       {
         %s
       }
+      public enum __compileTimeTag = %s;
     }
   };
   string ret;
@@ -154,7 +155,7 @@ string Generate(UnionData[] unions)
                         
           derivedConstructor ~= "\n\t\t\tthis._tag = Tags." ~ c.name ~ ";";     
                         
-          auto derivedClassDef = classTemplate.format(derivedAtts,c.name,data.name,derivedFields,derivedConstrcutorArgs,derivedConstructor);
+          auto derivedClassDef = classTemplate.format(derivedAtts,c.name,data.name,derivedFields,derivedConstrcutorArgs,derivedConstructor,"Tags."~c.name);
           ret ~= derivedClassDef;
           ret ~= "\n";
         }
@@ -171,8 +172,38 @@ template DU(string S)
 
 template IsUnion(UnionType)
 {
-  const IsUnion = __traits(compiles, {
+  enum IsUnion = __traits(compiles, {
       UnionType.Tags t;
       alias a = UnionType.__derivedTypes;
     });
 }
+
+template IsDescendantFromUnion(UnionType,ChildType)
+  if(IsUnion!UnionType)
+{
+  template ProcessTypes(T...)
+  {
+    static if(T.length ==0)
+      {
+        enum ProcessTypes = false;
+      }
+    else static if(is(T[0] : ChildType))
+      {
+        enum ProcessTypes = true;
+      }
+    else
+      {
+        enum ProcessTypes = ProcessTypes!(T[1..$]);
+      }
+  }
+
+  enum IsDescendantFromUnion = ProcessTypes!(UnionType.__derivedTypes);
+}
+
+template ComileTimeUnionTag(UnionType,ChildType)
+  if(IsDescendantFromUnion!(UnionType,ChildType))
+{
+  enum CompileTimeUnionTag = ChildType.__compileTimeTag;
+
+}
+     

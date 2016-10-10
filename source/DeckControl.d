@@ -125,17 +125,11 @@ class DeckControls(TState, T) : Control!TState
     {
       if(button == MouseButtonType.Left)
         {
-          if(style == LayoutStyle.OverlappingHorizontal)
-            {
-              ChangeStyle(LayoutStyle.OverlappingVertical);
-            }
-          else
-            {
-              ChangeStyle(LayoutStyle.OverlappingHorizontal);
-            }
-          // parent.DemoteZOrder(this);
-          // parent.mouseControl = null;
-          //RefreshMouseControl(state,x,y);
+          state.router.PostMessage(new Test());
+          import std.conv : to;
+          state.router.PostMessage(new Status("removing card " ~ to!string(card)));
+          wl("card count : ", deck.length);
+          ChangeStyle(LayoutStyle.Stack);
         }
       else
         {
@@ -163,16 +157,49 @@ class DeckControls(TState, T) : Control!TState
     {
       draw(card,faces[card], state, renderer, relativeBounds);
     }
+
   }
 
+  public void FixCards()
+  {
+    bool[T] found;
+    foreach(c;deck)
+      {
+        if(c !in faces)
+          {
+            faces[c] = Face.Back;
+          }
+        found[c] = true;
+      }
+
+    T[] toRemove;
+    foreach(kvp; faces.byKeyValue)
+      {
+        if(kvp.key !in found)
+          {
+            toRemove ~= kvp.key;
+          }
+      }
+    foreach(c;toRemove)
+      {
+        faces.remove(c);
+      }
+  }
   public override void Update(TState state)
   {
+    if(_children.length == 0 && deck.length > 0)
+      {
+        FixCards();
+        ChangeStyle(LayoutStyle.Stack);
+      }
+          
+         
     foreach(ff;f)
       if(ff !is null && ff.state != Fiber.State.TERM)
         {
           ff.call();
         }
-       
+
     
   }
   void ChangeStyle(LayoutStyle newStyle)
@@ -181,6 +208,7 @@ class DeckControls(TState, T) : Control!TState
     mouseControl = null;
     _children.length = 0;
     f.length = 0;
+    if(deck.length == 0) return;
     final switch(this.style)
       {
       case LayoutStyle.Stack:
@@ -194,8 +222,7 @@ class DeckControls(TState, T) : Control!TState
             auto card = new Card(this,c);
             card.bounds = b;
             AddControl(card);
-            b.x += 20;
-            b.y += 5;
+            b.x += 50;
           }
         break;
       case LayoutStyle.OverlappingVertical:
@@ -235,52 +262,23 @@ class DeckControls(TState, T) : Control!TState
         faces[card] = Face.Front;
       bounds = initialCardSize;
       this.draw = draw;
-      ChangeStyle(LayoutStyle.OverlappingVertical);
+      ChangeStyle(LayoutStyle.Stack);
+      //ChangeStyle(LayoutStyle.OverlappingVertical);
       //    ChangeStyle(LayoutStyle.OverlappingHorizontal);
     }
 
-  
-
- protected:
-  
-
-  override bool HandleInput(TState state, InputMessage msg, SDL_Rect relativeBounds, bool handled)
+  void EnsureFaces(Face face)
   {
-    return false;
+    foreach(card; this.deck)
+      faces[card] = face;
+
   }
 
-
-  override void Render(TState state, SDL_Renderer* renderer, SDL_Rect relativeBounds)
-  {
-    // final switch(style )
-    // {
-    // case LayoutStyle.Stack:
-    //   // just render a single card at the current size
-    //   draw(deck[0],renderer,relativeBounds);
-    //   break;
-    // case LayoutStyle.OverlappingHorizontal:
-    //   foreach(ref c;deck)
-    //     {
-    //       draw(c,renderer,relativeBounds);
-    //       relativeBounds.x += 10;
-    //     }
-    //   break;
-    // case LayoutStyle.OverlappingVertical:
-    //   foreach(ref c;deck)
-    //     {
-    //       draw(c,renderer,relativeBounds);
-    //       relativeBounds.y += 20;
-    //     }
-
-    //   break;
-    // }
-    return;
-  }
 }
 unittest
 {
   SDL_Rect r;
-  auto d = Deck!int();
+  //  auto d = Deck!int();
   // auto c = new DeckControls!int(null,d,r,(ref x,y,z) => {}()); 
 
 }
